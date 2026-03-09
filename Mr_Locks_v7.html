@@ -1,0 +1,3346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mr_Locks v7 — NCAA Betting Model</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c10;
+  --surface: #12151c;
+  --surface2: #1a1e28;
+  --surface3: #222836;
+  --border: #2a3040;
+  --border-light: #3a4258;
+  --text: #e8eaf0;
+  --text-dim: #8892a8;
+  --text-muted: #5a6480;
+  --accent: #00d4aa;
+  --accent-dim: #00d4aa30;
+  --gold: #f5c542;
+  --gold-dim: #f5c54230;
+  --red: #ff4d6a;
+  --red-dim: #ff4d6a25;
+  --blue: #4da6ff;
+  --blue-dim: #4da6ff25;
+  --green: #50fa7b;
+  --green-dim: #50fa7b25;
+  --yellow: #f1fa8c;
+  --yellow-dim: #f1fa8c20;
+  --lime: #a8ff60;
+  --lime-dim: #a8ff6025;
+  --orange: #ffb86c;
+  --purple: #bd93f9;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+  --display: 'Space Grotesk', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(135deg, #0d1117 0%, #161b26 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--accent), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+
+.btn {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn:hover { background: var(--surface3); border-color: var(--border-light); }
+.btn-accent { background: var(--accent); color: #000; border-color: var(--accent); }
+.btn-accent:hover { background: #00e8b8; }
+
+/* TABS */
+.tab-bar {
+  display: flex;
+  gap: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  overflow-x: auto;
+}
+
+.tab {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 12px 20px;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.tab:hover { color: var(--text-dim); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* PANELS */
+.panels { padding: 20px 24px; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* CALCULATOR PANEL */
+.calc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.team-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.team-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.team-label {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.team-label.fav {
+  background: var(--gold-dim);
+  color: var(--gold);
+  border: 1px solid var(--gold)40;
+}
+
+.team-label.dog {
+  background: var(--blue-dim);
+  color: var(--blue);
+  border: 1px solid var(--blue)40;
+}
+
+.team-input-wrap {
+  position: relative;
+}
+
+.team-input {
+  width: 100%;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.team-input:focus { border-color: var(--accent); }
+
+.team-input::placeholder { color: var(--text-muted); font-weight: 400; }
+
+.autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 0 0 var(--radius) var(--radius);
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 50;
+  display: none;
+}
+
+.autocomplete-list.show { display: block; }
+
+.ac-item {
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  transition: background 0.1s;
+}
+
+.ac-item:hover { background: var(--surface3); }
+.ac-item .ac-rank { color: var(--text-muted); font-family: var(--mono); font-size: 12px; }
+.ac-item .ac-conf { color: var(--text-dim); font-size: 12px; }
+
+.stats-preview {
+  margin-top: 12px;
+  display: none;
+  gap: 8px;
+}
+
+.stats-preview.show { display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); }
+
+.luck-warn {
+  color: var(--orange) !important;
+  position: relative;
+}
+
+.luck-safe {
+  color: var(--accent) !important;
+}
+
+.stat-pill {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+}
+
+.stat-pill-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-pill-value {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 2px;
+}
+
+/* SETTINGS ROW */
+.settings-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: end;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.setting-group { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+
+.setting-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: var(--mono);
+  text-align: center;
+}
+
+.setting-input {
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 8px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  outline: none;
+  width: 120px;
+  text-align: center;
+}
+
+.setting-input:focus { border-color: var(--accent); }
+
+.setting-select {
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 8px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  outline: none;
+}
+
+.calc-btn {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 28px;
+  background: linear-gradient(135deg, var(--accent), #00b895);
+  color: #000;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.15s;
+}
+
+.calc-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px var(--accent-dim); }
+
+/* RESULTS */
+.results-section {
+  display: none;
+}
+
+.results-section.show { display: block; }
+
+.results-header {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.score-projection {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 20px;
+}
+
+.score-team {
+  text-align: center;
+}
+
+.score-team-name {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.score-team-pts {
+  font-family: var(--mono);
+  font-size: 42px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.score-divider {
+  font-family: var(--mono);
+  font-size: 24px;
+  color: var(--text-muted);
+}
+
+/* VERDICT CARDS */
+.verdict-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.verdict-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.verdict-card.bet-3 { border-color: var(--yellow); background: var(--yellow-dim); }
+.verdict-card.bet-5 { border-color: var(--blue); background: var(--blue-dim); }
+.verdict-card.bet-7 { border-color: var(--lime); background: var(--lime-dim); }
+.verdict-card.bet-9 { border-color: #b388ff; background: #b388ff15; }
+.verdict-card.no-bet { border-color: var(--border); }
+
+.verdict-type {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.verdict-btn {
+  display: inline-block;
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 800;
+  padding: 10px 24px;
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.verdict-btn.bet-3 { background: var(--yellow); color: #000; }
+.verdict-btn.bet-5 { background: var(--blue); color: #000; }
+.verdict-btn.bet-7 { background: var(--lime); color: #000; }
+.verdict-btn.bet-9 { background: #b388ff; color: #000; }
+.verdict-btn.pass { background: var(--surface3); color: var(--text-muted); }
+
+.verdict-line {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.verdict-edge {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.verdict-detail {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+/* STATS BREAKDOWN */
+.breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.breakdown-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.breakdown-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.breakdown-value {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 2px;
+}
+
+.breakdown-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* MONTE CARLO SECTION */
+.mc-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.mc-header {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mc-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.mc-stat {
+  text-align: center;
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.mc-stat-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.mc-stat-value {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+.mc-chart {
+  width: 100%;
+  height: 160px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  position: relative;
+  overflow: hidden;
+}
+
+/* FOUR FACTORS */
+.ff-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.ff-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ff-table th {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 12px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.ff-table td {
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 8px 12px;
+  text-align: center;
+  border-bottom: 1px solid var(--border)40;
+}
+
+.ff-table td.edge-pos { color: var(--accent); font-weight: 700; }
+.ff-table td.edge-neg { color: var(--red); font-weight: 700; }
+
+/* RACE TO 5/10 */
+.race-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.race-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.race-card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+}
+
+.race-card-title {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.race-team-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.race-team-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.race-prob {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.race-ml {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* BET LOG */
+.log-table-wrap {
+  overflow-x: auto;
+}
+
+.log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.log-table th {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+}
+
+.log-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border)30;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.log-table tr:hover { background: var(--surface2); }
+
+.log-win { color: var(--accent); font-weight: 700; }
+.log-loss { color: var(--red); font-weight: 700; }
+
+/* ROI PANEL */
+.roi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.roi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  text-align: center;
+}
+
+.roi-card-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.roi-card-value {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+/* UPDATE MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  width: 600px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal h3 {
+  font-family: var(--display);
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.modal textarea {
+  width: 100%;
+  height: 300px;
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  resize: vertical;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  justify-content: flex-end;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .calc-grid { grid-template-columns: 1fr; }
+  .verdict-grid { grid-template-columns: 1fr; }
+  .mc-stats { grid-template-columns: repeat(2, 1fr); }
+  .roi-grid { grid-template-columns: repeat(2, 1fr); }
+  .settings-row { flex-direction: column; align-items: stretch; }
+  .header { flex-direction: column; gap: 8px; }
+  .score-projection { gap: 20px; }
+  .score-team-pts { font-size: 32px; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+
+/* Animation */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.3s ease-out; }
+
+/* Log checkboxes */
+.log-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 12px;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.log-check input { display: none; }
+.log-check.checked { border-color: var(--accent); background: var(--accent-dim); }
+.log-check .lc-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--text-muted);
+}
+
+.log-check.checked .lc-dot { border-color: var(--accent); background: var(--accent); }
+
+/* Bet tier colors in log table */
+.tier-yellow { color: var(--yellow) !important; }
+.tier-blue { color: var(--blue) !important; }
+.tier-lime { color: var(--lime) !important; }
+.tier-purple { color: #b388ff !important; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div>
+      <div class="logo">MR. LOCKS LINE LAB</div>
+      <div class="logo-sub">NCAA Betting Model · v7</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn" onclick="openModal('kenpom')">Update KenPom</button>
+    <button class="btn" onclick="openModal('injury')">Injury Guide</button>
+    <button class="btn" onclick="openModal('bankroll')">Settings</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tab-bar">
+  <div class="tab active" data-tab="calculator">Calculator</div>
+  <div class="tab" data-tab="betlog">Bet Log</div>
+  <div class="tab" data-tab="roi">ROI Tracker</div>
+</div>
+
+<!-- PANELS -->
+<div class="panels">
+
+<!-- ======== CALCULATOR PANEL ======== -->
+<div class="panel active" id="panel-calculator">
+
+  <!-- TEAM INPUTS -->
+  <div class="calc-grid">
+    <div class="team-card">
+      <div class="team-card-header">
+        <span class="team-label fav">FAVORITE</span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text-muted)">TEAM A</span>
+      </div>
+      <div class="team-input-wrap">
+        <input type="text" class="team-input" id="teamA" placeholder="e.g. Duke" autocomplete="off">
+        <div class="autocomplete-list" id="acA"></div>
+      </div>
+      <div class="stats-preview" id="previewA">
+        <div class="stat-pill"><div class="stat-pill-label">Conf</div><div class="stat-pill-value" id="pvConfA">—</div></div>
+        <div class="stat-pill"><div class="stat-pill-label">Record</div><div class="stat-pill-value" id="pvRecA">—</div></div>
+        <div class="stat-pill"><div class="stat-pill-label">NetRtg</div><div class="stat-pill-value" id="pvNetA">—</div></div>
+        <div class="stat-pill"><div class="stat-pill-label">AdjO</div><div class="stat-pill-value" id="pvAdjOA">—</div></div>
+        <div class="stat-pill"><div class="stat-pill-label">AdjD</div><div class="stat-pill-value" id="pvAdjDA">—</div></div>
+        <div class="stat-pill"><div class="stat-pill-label">AdjT</div><div class="stat-pill-value" id="pvAdjTA">—</div></div>
+      </div>
+      <div style="margin-top:10px;display:flex;align-items:center;gap:8px;justify-content:center">
+        <label style="font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;white-space:nowrap">Adjust ±pts</label>
+        <input type="number" class="setting-input" id="adjA" value="0" step="0.5" style="width:70px;text-align:center" title="Manual adjustment: injuries, momentum, eye test. Positive = add points, negative = subtract.">
+        <span style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">injury / momentum</span>
+      </div>
+    </div>
+
+    <div class="team-card">
+      <div class="team-card-header">
+        <span class="team-label dog">UNDERDOG</span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text-muted)">TEAM B</span>
+      </div>
+      <div class="team-input-wrap">
+        <input type="text" class="team-input" id="teamB" placeholder="e.g. Vermont" autocomplete="off">
+        <div class="autocomplete-list" id="acB"></div>
+      </div>
+      <div class="stats-preview" id="previewB">
+        <div class="stat-pill"><div class="stat-pill-label">Conf</div><div class="stat-pill-value" id="pvConfB">—</div></div>
+        <div class="stat-pill"><div class="stat-pill-label">Record</div><div class="stat-pill-value" id="pvRecB">—</div></div>
+        <div class="stat-pill"><div class="stat-pill-label">NetRtg</div><div class="stat-pill-value" id="pvNetB">—</div></div>
+        <div class="stat-pill"><div class="stat-pill-label">AdjO</div><div class="stat-pill-value" id="pvAdjOB">—</div></div>
+        <div class="stat-pill"><div class="stat-pill-label">AdjD</div><div class="stat-pill-value" id="pvAdjDB">—</div></div>
+        <div class="stat-pill"><div class="stat-pill-label">AdjT</div><div class="stat-pill-value" id="pvAdjTB">—</div></div>
+      </div>
+      <div style="margin-top:10px;display:flex;align-items:center;gap:8px;justify-content:center">
+        <label style="font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;white-space:nowrap">Adjust ±pts</label>
+        <input type="number" class="setting-input" id="adjB" value="0" step="0.5" style="width:70px;text-align:center" title="Manual adjustment: injuries, momentum, eye test. Positive = add points, negative = subtract.">
+        <span style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">injury / momentum</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAT COLOR LEGEND -->
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;font-family:var(--mono);font-size:10px;letter-spacing:0.5px;align-items:center">
+    <span style="color:var(--text-muted)">STAT COLORS:</span>
+    <span style="color:#b388ff">● ELITE</span>
+    <span style="color:#00d4aa">● GOOD</span>
+    <span style="color:#4ea8de">● AVERAGE</span>
+    <span style="color:#f5c542">● BELOW AVG</span>
+    <span style="color:#ff4757">● POOR</span>
+  </div>
+
+  <!-- SETTINGS ROW -->
+  <div class="settings-row">
+    <div class="setting-group">
+      <label class="setting-label">Game Site</label>
+      <select class="setting-select" id="gameSite">
+        <option value="neutral" selected>Neutral Court</option>
+        <option value="homeA">Home A (Favorite)</option>
+        <option value="homeB">Home B (Underdog)</option>
+      </select>
+    </div>
+    <div class="setting-group">
+      <label class="setting-label">Market Spread (A)</label>
+      <input type="number" class="setting-input" id="mktSpread" placeholder="-7.5" step="0.5">
+    </div>
+    <div class="setting-group">
+      <label class="setting-label">Market Total (O/U)</label>
+      <input type="number" class="setting-input" id="mktTotal" placeholder="148.5" step="0.5">
+    </div>
+    <div class="setting-group">
+      <label class="setting-label">Market ML (A)</label>
+      <input type="number" class="setting-input" id="mktMLA" placeholder="-350" step="1">
+    </div>
+    <div class="setting-group">
+      <label class="setting-label">Market ML (B)</label>
+      <input type="number" class="setting-input" id="mktMLB" placeholder="+280" step="1">
+    </div>
+    <div class="setting-group">
+      <label class="setting-label">1H Spread (A)</label>
+      <input type="number" class="setting-input" id="mkt1HSpread" placeholder="—" step="0.5" style="opacity:0.6" onfocus="this.style.opacity=1" onblur="if(!this.value)this.style.opacity=0.6">
+    </div>
+    <div class="setting-group">
+      <label class="setting-label">Bankroll ($)</label>
+      <input type="number" class="setting-input" id="bankrollInput" value="1000" step="25" min="0" onchange="updateStartingBankroll(this.value)">
+    </div>
+    <button class="calc-btn" id="calcBtn" onclick="calculate()">CALCULATE LINE</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-section" id="resultsSection">
+
+    <!-- SCORE PROJECTION -->
+    <div class="results-header fade-in">📊 Score Projection</div>
+    <div class="score-projection fade-in" id="scoreProj" style="flex-direction:column;gap:0;padding-bottom:0">
+      <div style="display:flex;align-items:center;justify-content:center;gap:40px;padding-bottom:16px">
+        <div class="score-team">
+          <div class="score-team-name" id="scoreNameA">—</div>
+          <div class="score-team-pts" id="scorePtsA">0</div>
+        </div>
+        <div class="score-divider">—</div>
+        <div class="score-team">
+          <div class="score-team-name" id="scoreNameB">—</div>
+          <div class="score-team-pts" id="scorePtsB">0</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:1.5px;writing-mode:vertical-rl;text-orientation:mixed">RAW</div>
+      </div>
+      <div style="border-top:1px dashed var(--border);display:flex;align-items:center;justify-content:center;gap:40px;padding:16px 0">
+        <div class="score-team">
+          <div class="score-team-name" id="blendNameA" style="font-size:12px">—</div>
+          <div class="score-team-pts" id="blendPtsA" style="font-size:30px;color:var(--gold)">0</div>
+        </div>
+        <div class="score-divider" style="font-size:16px">—</div>
+        <div class="score-team">
+          <div class="score-team-name" id="blendNameB" style="font-size:12px">—</div>
+          <div class="score-team-pts" id="blendPtsB" style="font-size:30px;color:var(--gold)">0</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:1.5px;writing-mode:vertical-rl;text-orientation:mixed">BLENDED</div>
+      </div>
+    </div>
+
+    <!-- CONFERENCE MISMATCH TAG -->
+    <div id="confTag" style="display:none;padding:10px 16px;background:var(--orange)15;border:1px solid var(--orange)40;border-radius:var(--radius);margin-bottom:16px;font-size:12px;color:var(--orange);font-family:var(--sans);line-height:1.5" class="fade-in"></div>
+
+    <!-- VERDICT CARDS -->
+    <div class="results-header fade-in">🎯 Betting Verdicts</div>
+    <!-- LEGEND -->
+    <div class="fade-in" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;font-family:var(--mono);font-size:11px;align-items:center">
+      <span style="color:var(--text-muted)">LEGEND:</span>
+      <span style="color:var(--red)">❌ PASS — No edge</span>
+      <span style="color:var(--yellow)">🟡 BET — Low edge</span>
+      <span style="color:var(--blue)">🔵 BET — Medium edge</span>
+      <span style="color:var(--lime)">🟢 BET — Strong edge</span>
+      <span style="color:#b388ff">🟣 BET — Premium Edge</span>
+    </div>
+    <div class="verdict-grid fade-in">
+      <!-- SPREAD -->
+      <div class="verdict-card" id="vcSpread">
+        <div class="verdict-type">SPREAD</div>
+        <div class="verdict-btn pass" id="vcSpreadBtn">PASS</div>
+        <div class="verdict-line" id="vcSpreadLine">—</div>
+        <div class="verdict-edge" id="vcSpreadEdge">—</div>
+        <div class="verdict-detail" id="vcSpreadDetail">—</div>
+      </div>
+      <!-- TOTAL -->
+      <div class="verdict-card" id="vcTotal">
+        <div class="verdict-type">TOTAL (O/U)</div>
+        <div class="verdict-btn pass" id="vcTotalBtn">PASS</div>
+        <div class="verdict-line" id="vcTotalLine">—</div>
+        <div class="verdict-edge" id="vcTotalEdge">—</div>
+        <div class="verdict-detail" id="vcTotalDetail">—</div>
+      </div>
+      <!-- MONEYLINE -->
+      <div class="verdict-card" id="vcML">
+        <div class="verdict-type">MONEYLINE</div>
+        <div class="verdict-btn pass" id="vcMLBtn">PASS</div>
+        <div class="verdict-line" id="vcMLLine">—</div>
+        <div class="verdict-edge" id="vcMLEdge">—</div>
+        <div class="verdict-detail" id="vcMLDetail">—</div>
+      </div>
+      <!-- FIRST HALF SPREAD -->
+      <div class="verdict-card" id="vcFH">
+        <div class="verdict-type">1ST HALF SPREAD</div>
+        <div class="verdict-btn pass" id="vcFHBtn">PASS</div>
+        <div class="verdict-line" id="vcFHLine">—</div>
+        <div class="verdict-edge" id="vcFHEdge">—</div>
+        <div class="verdict-detail" id="vcFHDetail">—</div>
+      </div>
+    </div>
+
+    <!-- LIVE BETTING TRIPWIRES -->
+    <div class="results-header fade-in">⚡ Live Bet Tripwires</div>
+    <div class="mc-section fade-in" id="tripwireSection" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" id="tripwireGrid"></div>
+    </div>
+
+    <!-- RACE TO 5/10 -->
+    <div class="race-section fade-in" id="raceSection">
+      <div class="mc-header">🏁 Race to 5 & Race to 10</div>
+      <div class="race-grid" id="raceGrid"></div>
+    </div>
+
+    <!-- BREAKDOWN -->
+    <div class="results-header fade-in">📐 Model Breakdown</div>
+    <div class="breakdown-grid fade-in" id="breakdownGrid"></div>
+
+    <!-- MONTE CARLO -->
+    <div class="mc-section fade-in" id="mcSection">
+      <div class="mc-header">🎲 Monte Carlo Simulation (10,000 runs)</div>
+      <div class="mc-stats" id="mcStats"></div>
+      <div class="mc-chart"><canvas id="mcCanvas" width="800" height="160"></canvas></div>
+      <div style="padding:14px 16px;background:var(--bg);border-radius:var(--radius);font-size:12px;line-height:1.7;color:var(--text-dim);margin-top:12px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">How to read this</div>
+        The simulation runs the game 10,000 times using the projected score as the center point, with random variance applied to each team's output per run. A shared pace factor correlates both scores — if the game plays fast, both teams score more together.<br><br>
+        <b style="color:var(--text)">Win %</b> — How often Team A wins outright across all simulations. Above 50% = model favors A. This drives the moneyline verdict.<br>
+        <b style="color:var(--text)">Cover %</b> — How often Team A beats the market spread. This is the key number for spread bets — if it's near 50%, the market is sharp and there's no edge. Well above 50% = the spread has value.<br>
+        <b style="color:var(--text)">Over %</b> — How often the combined score exceeds the market total. Above 60% is a meaningful lean. Above 75% is a strong signal.<br>
+        <b style="color:var(--text)">Avg Margin</b> — The average winning margin across all simulations. Compare this to the market spread — the gap between them is your edge.<br>
+        <b style="color:var(--text)">Histogram</b> — The distribution of all 10,000 simulated margins. <span style="color:var(--accent)">Green bars</span> = Team A wins, <span style="color:var(--red)">red bars</span> = Team B wins. The <span style="color:var(--gold)">yellow dashed line</span> is the market spread — everything to its right means A covers. The wider the distribution, the more variance in the matchup.
+      </div>
+    </div>
+
+    <!-- RECENT GAMES & HEAD TO HEAD -->
+    <div class="mc-section fade-in" id="recentSection" style="display:none">
+      <div class="mc-header">📅 Recent Form & Head-to-Head</div>
+      <div id="recentContent"></div>
+    </div>
+
+    <!-- LOG THIS BET -->
+    <div style="text-align:center;margin:20px 0" id="logBetArea">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px">Select bets to log</div>
+      <div id="logCheckboxes" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:12px"></div>
+      <button class="btn btn-accent" onclick="logSelectedBets()">LOG SELECTED BETS</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======== BET LOG PANEL ======== -->
+<div class="panel" id="panel-betlog">
+  <div class="results-header">📝 Bet History</div>
+  <div style="margin-bottom:12px;display:flex;gap:8px;align-items:center">
+    <button class="btn" onclick="exportLog()">Export CSV</button>
+    <button class="btn" style="color:var(--red)" onclick="clearLog()">Clear All</button>
+  </div>
+  <div class="log-table-wrap">
+    <table class="log-table" id="logTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Matchup</th>
+          <th>Bet Type</th>
+          <th>Tier</th>
+          <th>Side</th>
+          <th>My Line</th>
+          <th>Mkt Line</th>
+          <th>Edge</th>
+          <th>Bet $</th>
+          <th>Result</th>
+          <th>P&L</th>
+          <th>Bankroll</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="logBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ======== ROI PANEL ======== -->
+<div class="panel" id="panel-roi">
+  <div class="results-header">📈 ROI Dashboard</div>
+  <div class="roi-grid" id="roiGrid"></div>
+  <div class="mc-section" id="roiChartSection">
+    <div class="mc-header">Bankroll Over Time</div>
+    <div class="mc-chart"><canvas id="roiCanvas" width="800" height="160"></canvas></div>
+  </div>
+</div>
+
+</div><!-- END PANELS -->
+
+<!-- KENPOM UPDATE MODAL -->
+<div class="modal-overlay" id="modalKenpom">
+  <div class="modal">
+    <h3>Update KenPom Data</h3>
+    <p style="font-size:13px;color:var(--text-dim);margin-bottom:12px">Paste tab-separated KenPom data (rank, team, conf, record, NetRtg, ORtg, ORtg rank, DRtg, DRtg rank, AdjT, etc.)</p>
+    <textarea id="kpTextarea" placeholder="1&#9;Duke&#9;ACC&#9;28-2&#9;+40.79&#9;128.8&#9;4&#9;88.0&#9;1&#9;65.2..."></textarea>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('kenpom')">Cancel</button>
+      <button class="btn btn-accent" onclick="parseKenPom()">Load Data</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="modalInjury">
+  <div class="modal">
+    <h3>Injury / Adjustment Guide</h3>
+    <div style="font-size:13px;color:var(--text-dim);line-height:1.8;margin-top:8px">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Player Out — Use their PPG</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-family:var(--mono);font-size:12px">
+        <span style="color:#b388ff;font-weight:700">20+ PPG</span><span>Star / Go-to scorer → <b style="color:var(--text)">-4 to -5 pts</b></span>
+        <span style="color:#00d4aa;font-weight:700">15-19 PPG</span><span>2nd option → <b style="color:var(--text)">-3 to -4 pts</b></span>
+        <span style="color:#4ea8de;font-weight:700">10-14 PPG</span><span>Starter / role player → <b style="color:var(--text)">-2 to -3 pts</b></span>
+        <span style="color:#f5c542;font-weight:700">6-9 PPG</span><span>Rotation player → <b style="color:var(--text)">-1 to -1.5 pts</b></span>
+        <span style="color:#ff4757;font-weight:700">Under 6 PPG</span><span>Bench → <b style="color:var(--text)">Don't adjust</b></span>
+      </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Why not their full PPG?</div>
+        <span style="color:var(--text-dim)">The backup absorbs some production. Other players get more touches. The real loss is the efficiency gap between the star and his replacement — roughly <b style="color:var(--text)">20-25%</b> of the player's PPG.</span>
+      </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Other Adjustments</div>
+        <span style="color:var(--text-dim)"><b style="color:var(--text)">Back-to-back games:</b> -1 to -1.5 pts for fatigue<br>
+        <b style="color:var(--text)">Momentum / hot streaks:</b> Don't adjust. KenPom already captures team quality. Streaks are mostly noise.</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-accent" onclick="closeModal('injury')">Got It</button>
+    </div>
+  </div>
+</div>
+
+<!-- BANKROLL/SETTINGS MODAL -->
+<div class="modal-overlay" id="modalBankroll">
+  <div class="modal">
+    <h3>Settings</h3>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
+      <div class="setting-group">
+        <label class="setting-label">National Average Efficiency</label>
+        <input type="number" class="setting-input" id="natlAvgInput" value="109.5" step="0.1" style="width:100%">
+        <span style="font-size:11px;color:var(--text-muted)">2025-26 D1 avg ≈ 109.5</span>
+      </div>
+      <div class="setting-group">
+        <label class="setting-label">Monte Carlo Simulations</label>
+        <input type="number" class="setting-input" id="mcSimsInput" value="10000" step="1000" style="width:100%">
+      </div>
+      <div class="setting-group">
+        <label class="setting-label">Home Court Advantage (pts)</label>
+        <input type="number" class="setting-input" id="hcaInput" value="3.0" step="0.1" style="width:100%">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('bankroll')">Cancel</button>
+      <button class="btn btn-accent" onclick="saveSettings()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// MR_LOCKS v7 — COMPLETE BETTING MODEL
+// Mr. Locks NCAA Basketball Handicapping System
+// ============================================================
+
+// ---- GLOBAL STATE ----
+// Math.erf polyfill (error function for normal distribution CDF)
+if (!Math.erf) {
+  Math.erf = function(x) {
+    const a1=0.254829592, a2=-0.284496736, a3=1.421413741, a4=-1.453152027, a5=1.061405429, p=0.3275911;
+    const sign = x < 0 ? -1 : 1;
+    x = Math.abs(x);
+    const t = 1 / (1 + p * x);
+    const y = 1 - (((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t * Math.exp(-x*x);
+    return sign * y;
+  };
+}
+
+const STATE = {
+  teams: [],           // KenPom team data array
+  teamMap: {},         // name -> team object
+  bankroll: 1000,
+  startingBankroll: 1000,
+  natlAvg: 109.5,
+  mcSims: 10000,
+  hca: 3.0,
+  betLog: [],
+  lastResult: null,
+  trCache: {},         // TeamRankings cache
+  selectedA: null,
+  selectedB: null,
+};
+
+// ---- KENPOM → TEAMRANKINGS NAME MAP ----
+const KP_TO_TR = {
+  "abilene christian":"abl christian","alabama st.":"alabama st","alcorn st.":"alcorn st",
+  "appalachian st.":"app st","arizona st.":"arizona st","arkansas pine bluff":"ar-pine bluff",
+  "arkansas st.":"arkansas st","ball st.":"ball st","bethune cookman":"bethune",
+  "boise st.":"boise st","boston university":"boston u","cal st. bakersfield":"cs bakersfield","cal st. fullerton":"cs fullerton","central arkansas":"c arkansas",
+  "central connecticut":"c connecticut","central michigan":"c michigan",
+  "charleston southern":"charleston so","chicago st.":"chicago st","cleveland st.":"cleveland st",
+  "coastal carolina":"coastal car","colorado st.":"colorado st","connecticut":"uconn",
+  "coppin st.":"coppin st","csun":"cs northridge","delaware st.":"delaware st",
+  "east carolina":"e carolina","east tennessee st.":"e tennessee st","east texas a&m":"e texas a&m",
+  "eastern illinois":"e illinois","eastern kentucky":"e kentucky","eastern michigan":"e michigan",
+  "eastern washington":"e washington","fairleigh dickinson":"f dickinson","fiu":"florida intl",
+  "florida gulf coast":"fgcu","florida st.":"florida st","fresno st.":"fresno st",
+  "gardner webb":"gardner-webb","george washington":"g washington","georgia southern":"georgia so",
+  "georgia st.":"georgia st","grambling st.":"grambling","hawaii":"hawai'i",
+  "houston christian":"hou christian","idaho st.":"idaho st","illinois st.":"illinois st",
+  "indiana st.":"indiana st","iowa st.":"iowa st","jackson st.":"jackson st",
+  "jacksonville st.":"jacksonville st","james madison":"j madison","kansas st.":"kansas st",
+  "kennesaw st.":"kennesaw st","kent st.":"kent st","long beach st.":"long beach st",
+  "louisiana monroe":"ul monroe","loyola chicago":"loyola chi","loyola marymount":"loyola mymt",
+  "maryland eastern shore":"maryland es","massachusetts":"umass","miami fl":"miami",
+  "michigan st.":"michigan st","middle tennessee":"middle tenn","mississippi st.":"mississippi st",
+  "mississippi valley st.":"miss valley st","missouri st.":"missouri st","montana st.":"montana st",
+  "morehead st.":"morehead st","morgan st.":"morgan st","mount st. mary's":"mt st mary's",
+  "murray st.":"murray st","n.c. state":"nc state","nebraska omaha":"omaha",
+  "new mexico st.":"new mexico st","norfolk st.":"norfolk st","north alabama":"n alabama",
+  "north carolina a&t":"nc a&t","north carolina central":"nc central",
+  "north dakota st.":"n dakota st","north florida":"n florida","north texas":"n texas",
+  "northern arizona":"n arizona","northern colorado":"n colorado","northern illinois":"n illinois",
+  "northern iowa":"n iowa","northern kentucky":"n kentucky","northwestern st.":"nw state",
+  "ohio st.":"ohio st","oklahoma st.":"oklahoma st","oregon st.":"oregon st",
+  "penn st.":"penn st","portland st.":"portland st","prairie view a&m":"prairie view",
+  "purdue fort wayne":"purdue fw","sacramento st.":"sacramento st","saint francis":"st francis pa",
+  "sam houston st.":"sam houston","san diego st.":"san diego st","san jose st.":"san jose st",
+  "siue":"siu edward","south alabama":"s alabama","south carolina st.":"s carolina st",
+  "south dakota st.":"s dakota st","south florida":"s florida","southeast missouri":"se missouri st",
+  "southeastern louisiana":"se louisiana","southern illinois":"s illinois",
+  "southern indiana":"s indiana","southern utah":"s utah","st. bonaventure":"st bonaventure",
+  "st. john's":"st john's","st. thomas":"st thomas","stephen f. austin":"sf austin",
+  "tarleton st.":"tarleton st","tennessee martin":"ut martin","tennessee st.":"tennessee st",
+  "tennessee tech":"tenn tech","texas a&m corpus chris":"texas a&m-cc","texas southern":"texas so",
+  "texas st.":"texas st","uc san diego":"ucsd","uc santa barbara":"ucsb",
+  "unc asheville":"nc asheville","unc greensboro":"nc greensboro","unc wilmington":"nc wilmington",
+  "usc upstate":"sc upstate","ut rio grande valley":"ut rio grande","utah st.":"utah st",
+  "washington st.":"washington st","weber st.":"weber st","west georgia":"w georgia",
+  "western carolina":"w carolina","western illinois":"w illinois","western kentucky":"w kentucky",
+  "western michigan":"w michigan","wichita st.":"wichita st","wright st.":"wright st",
+  "youngstown st.":"youngstown st",
+};
+
+// ---- KENPOM DATA PARSER ----
+function parseKenPomText(text) {
+  const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+  const teams = [];
+  let debugFirstLuck = null;
+  for (const line of lines) {
+    // Split on tabs first; if that gives < 10 columns, try multiple spaces
+    let parts = line.split(/\t/);
+    if (parts.length < 10) parts = line.split(/\s{2,}/);
+    if (parts.length < 10) continue;
+    const rank = parseInt(parts[0]);
+    if (isNaN(rank)) continue;
+    const name = parts[1].trim();
+    const conf = parts[2].trim();
+    const record = parts[3].trim();
+    const netRtg = parseFloat(parts[4]);
+    const adjO = parseFloat(parts[5]);
+    const adjORank = parseInt(parts[6]);
+    const adjD = parseFloat(parts[7]);
+    const adjDRank = parseInt(parts[8]);
+    const adjT = parseFloat(parts[9]);
+    if (isNaN(adjO) || isNaN(adjD) || isNaN(adjT)) continue;
+    // Parse Luck — column 11 (after AdjT rank at column 10)
+    let luck = 0;
+    if (parts.length > 11) {
+      const luckRaw = parts[11].trim().replace(/[^0-9.+-]/g, '');
+      luck = parseFloat(luckRaw);
+      if (isNaN(luck)) luck = 0;
+    }
+    if (debugFirstLuck === null && rank <= 3) {
+      debugFirstLuck = { name, col11raw: parts[11] || 'MISSING', cols: parts.length, luck };
+    }
+    teams.push({ rank, name, conf, record, netRtg, adjO, adjORank, adjD, adjDRank, adjT, luck });
+  }
+  if (debugFirstLuck) {
+    STATE._debugLuck = debugFirstLuck;
+  }
+  return teams;
+}
+
+function parseKenPom() {
+  const text = document.getElementById('kpTextarea').value;
+  const teams = parseKenPomText(text);
+  if (teams.length < 10) {
+    alert('Parsed fewer than 10 teams — check format (tab-separated).');
+    return;
+  }
+  STATE.teams = teams;
+  STATE.teamMap = {};
+  for (const t of teams) STATE.teamMap[t.name.toLowerCase()] = t;
+  closeModal('kenpom');
+  alert(`Loaded ${teams.length} teams.`);
+}
+
+// ---- DEFAULT DATA (placeholder — user pastes real data) ----
+// We'll load from localStorage on init if available
+
+// ---- AUTOCOMPLETE ----
+function setupAutocomplete(inputId, listId, previewId, side) {
+  const input = document.getElementById(inputId);
+  const list = document.getElementById(listId);
+
+  input.addEventListener('input', () => {
+    const q = input.value.toLowerCase().trim();
+    list.innerHTML = '';
+    if (q.length < 2 || STATE.teams.length === 0) { list.classList.remove('show'); return; }
+    const matches = STATE.teams.filter(t => t.name.toLowerCase().includes(q)).slice(0, 15);
+    if (matches.length === 0) { list.classList.remove('show'); return; }
+    for (const t of matches) {
+      const div = document.createElement('div');
+      div.className = 'ac-item';
+      div.innerHTML = `<span>${t.name}</span><span><span class="ac-rank">#${t.rank}</span> <span class="ac-conf">${t.conf}</span></span>`;
+      div.addEventListener('click', () => {
+        input.value = t.name;
+        list.classList.remove('show');
+        if (side === 'A') STATE.selectedA = t;
+        else STATE.selectedB = t;
+        showPreview(previewId, t);
+      });
+      list.appendChild(div);
+    }
+    list.classList.add('show');
+  });
+
+  input.addEventListener('blur', () => {
+    setTimeout(() => {
+      list.classList.remove('show');
+      // Auto-resolve exact match if user typed a valid name without clicking dropdown
+      const exact = STATE.teams.find(t => t.name.toLowerCase() === input.value.toLowerCase().trim());
+      if (exact) {
+        if (side === 'A') STATE.selectedA = exact;
+        else STATE.selectedB = exact;
+        showPreview(previewId, exact);
+      }
+    }, 200);
+  });
+}
+
+function showPreview(id, t) {
+  const el = document.getElementById(id);
+  el.classList.add('show');
+  const s = id === 'previewA' ? 'A' : 'B';
+
+  // Color functions matching KenPom color rankings
+  const CONF_PURPLE = ['b10','b12','acc','be','sec'];
+  const CONF_GREEN = ['mwc','wcc','a10'];
+  const CONF_BLUE = ['amer','mvc','caa','cusa','mac'];
+  const CONF_YELLOW = ['asun','bsky','bsth','bw','horz','ivy','maac','ovc','sb','sc','sind','sum','wac'];
+  const CONF_RED = ['swac','pl','nec','ae','meac'];
+
+  function confColor(conf) {
+    const c = (conf || '').toLowerCase();
+    if (CONF_PURPLE.includes(c)) return '#b388ff'; // purple
+    if (CONF_GREEN.includes(c)) return '#00d4aa'; // green
+    if (CONF_BLUE.includes(c)) return '#4ea8de'; // blue
+    if (CONF_YELLOW.includes(c)) return '#f5c542'; // yellow
+    if (CONF_RED.includes(c)) return '#ff4757'; // red
+    return '#8a8f98'; // grey for unknown
+  }
+
+  function recColor(record) {
+    const w = parseInt((record || '').split('-')[0]) || 0;
+    if (w >= 30) return '#b388ff'; // purple
+    if (w >= 25) return '#00d4aa'; // green
+    if (w >= 21) return '#4ea8de'; // blue
+    if (w >= 18) return '#f5c542'; // yellow
+    return '#ff4757'; // red
+  }
+
+  function netColor(net) {
+    if (net >= 30) return '#b388ff';
+    if (net >= 20) return '#00d4aa';
+    if (net >= 10) return '#4ea8de';
+    if (net >= 0) return '#f5c542';
+    return '#ff4757';
+  }
+
+  function ortgColor(o) {
+    if (o >= 125) return '#b388ff';
+    if (o >= 120) return '#00d4aa';
+    if (o >= 110) return '#4ea8de';
+    if (o >= 100) return '#f5c542';
+    return '#ff4757';
+  }
+
+  function drtgColor(d) {
+    if (d <= 98) return '#b388ff';
+    if (d <= 105) return '#00d4aa';
+    if (d <= 108.9) return '#4ea8de';
+    if (d <= 112.9) return '#f5c542';
+    return '#ff4757';
+  }
+
+  function tempoColor(t) {
+    if (t >= 71) return '#b388ff';
+    if (t >= 69) return '#00d4aa';
+    if (t >= 67) return '#4ea8de';
+    if (t >= 66) return '#f5c542';
+    return '#ff4757';
+  }
+
+  // Set values
+  const confEl = document.getElementById('pvConf' + s);
+  confEl.textContent = t.conf || '—';
+  confEl.style.color = confColor(t.conf);
+
+  const recEl = document.getElementById('pvRec' + s);
+  recEl.textContent = t.record || '—';
+  recEl.style.color = recColor(t.record);
+
+  const netVal = t.netRtg || 0;
+  const netStr = (netVal >= 0 ? '+' : '') + netVal.toFixed(1);
+  const netEl = document.getElementById('pvNet' + s);
+  netEl.textContent = netStr;
+  netEl.style.color = netColor(netVal);
+
+  const adjOEl = document.getElementById('pvAdjO' + s);
+  adjOEl.textContent = t.adjO.toFixed(1);
+  adjOEl.style.color = ortgColor(t.adjO);
+
+  const adjDEl = document.getElementById('pvAdjD' + s);
+  adjDEl.textContent = t.adjD.toFixed(1);
+  adjDEl.style.color = drtgColor(t.adjD);
+
+  const adjTEl = document.getElementById('pvAdjT' + s);
+  adjTEl.textContent = t.adjT.toFixed(1);
+  adjTEl.style.color = tempoColor(t.adjT);
+}
+
+// ---- CORE MODEL ----
+function computeModel(tA, tB, site, mktSp, mktTo, adjA, adjB) {
+  const NA = STATE.natlAvg; // ~109.5
+  const hca = STATE.hca;
+  adjA = adjA || 0;
+  adjB = adjB || 0;
+
+  // Possessions — harmonic mean when tempo differential >= 5, else geometric mean
+  const tempoDiff = Math.abs(tA.adjT - tB.adjT);
+  let poss;
+  if (tempoDiff >= 5) {
+    poss = 2 / (1/tA.adjT + 1/tB.adjT);
+  } else {
+    poss = Math.sqrt(tA.adjT * tB.adjT);
+  }
+
+  // Offensive rating vs opponent defense
+  const ortgA = (tA.adjO / NA) * (tB.adjD / NA) * NA;
+  const ortgB = (tB.adjO / NA) * (tA.adjD / NA) * NA;
+
+  // Raw points + manual adjustments (injuries, momentum, eye test)
+  let ptsA = poss * (ortgA / 100) + adjA;
+  let ptsB = poss * (ortgB / 100) + adjB;
+
+  // Home court advantage — scales with tempo
+  if (site === 'homeA') {
+    const hcaScaled = hca * (poss / 68);
+    ptsA += hcaScaled / 2;
+    ptsB -= hcaScaled / 2;
+  } else if (site === 'homeB') {
+    const hcaScaled = hca * (poss / 68);
+    ptsB += hcaScaled / 2;
+    ptsA -= hcaScaled / 2;
+  }
+  // Neutral = no adjustment
+
+  const rawSpread = ptsA - ptsB; // positive = A wins
+  const rawTotal = ptsA + ptsB;
+
+  // Blowout blend — market weight increases with spread size
+  const absSpread = Math.abs(mktSp);
+  let bW; // market weight
+  if (absSpread >= 25) bW = 0.70;
+  else if (absSpread >= 20) bW = 0.65;
+  else if (absSpread >= 14) bW = 0.55;
+  else bW = 0.35;
+
+  // Convert market spread to A-margin convention
+  // mktSp is entered as negative when A is favored: e.g. -7.5
+  const mktMargin = -mktSp; // positive = market has A winning by this much
+
+  // Blended spread (in A-wins-by-X convention)
+  const blendedMargin = (1 - bW) * rawSpread + bW * mktMargin;
+  const modelSpread = -blendedMargin; // convert back to spread convention (negative = A favored)
+
+  // Blended total — higher market weight because Vegas is sharper on totals
+  // Totals are driven by pace + efficiency which are more stable/predictable
+  const bWT = Math.min(0.75, bW + 0.20); // totals trust market ~20% more than spreads
+  const blendedTotal = (1 - bWT) * rawTotal + bWT * mktTo;
+
+  // First half projection (≈53% of game totals)
+  const fhSpread = modelSpread * 0.53;
+  const fhTotal = blendedTotal * 0.53;
+
+  return {
+    poss, ortgA, ortgB, ptsA, ptsB,
+    rawSpread, rawTotal,
+    modelSpread, blendedTotal,
+    blendedMargin,
+    fhSpread, fhTotal,
+    bW, bWT, tempoDiff,
+    adjA, adjB
+  };
+}
+
+// ---- EDGE DETECTION ----
+function computeEdges(model, mktSp, mktTo) {
+  // SPREAD: modelMargin = how much A wins by. mktMargin = how much market says A wins by.
+  const modelMargin = -model.modelSpread; // positive = A wins by this
+  const mktMargin = -mktSp; // positive = A favored by this
+
+  // diff > 0 → model is more confident in A → bet A (favorite)
+  // diff < 0 → model is less confident in A → bet B (underdog)
+  const spreadDiff = modelMargin - mktMargin;
+  const spreadEdge = Math.abs(spreadDiff);
+
+  let spreadSide, spreadLine;
+  if (spreadDiff >= 0) {
+    // Model thinks A covers
+    spreadSide = 'A';
+    spreadLine = mktSp; // e.g. -7.5
+  } else {
+    // Model thinks B covers
+    spreadSide = 'B';
+    spreadLine = -mktSp; // flip to B's perspective, e.g. +7.5
+  }
+
+  // TOTAL: model vs market
+  const totalDiff = model.blendedTotal - mktTo; // positive = model projects more = OVER
+  const totalEdge = Math.abs(totalDiff);
+  const totalSide = totalDiff >= 0 ? 'OVER' : 'UNDER';
+
+  // Convert edges to percentage (relative to spread/total magnitude)
+  const spreadEdgePct = mktSp !== 0 ? (spreadEdge / Math.abs(mktSp)) * 100 : spreadEdge * 10;
+  const totalEdgePct = mktTo > 0 ? (totalEdge / mktTo) * 100 : 0;
+
+  return {
+    spreadSide, spreadLine, spreadEdge, spreadDiff, spreadEdgePct,
+    totalSide, totalEdge, totalDiff, totalEdgePct,
+  };
+}
+
+// ---- MONEYLINE EDGE ----
+function computeMLEdge(winProbA, mktMLA, mktMLB, projectedMargin) {
+  if (!mktMLA || !mktMLB) return { mlSide: null, mlEdge: 0, mlEdgePct: 0, implProbA: 0, implProbB: 0, noVigA: 0, noVigB: 0 };
+
+  // Convert American ML to implied probability (includes vig)
+  function mlToProb(ml) {
+    if (ml < 0) return Math.abs(ml) / (Math.abs(ml) + 100);
+    return 100 / (ml + 100);
+  }
+
+  const rawImplA = mlToProb(mktMLA);
+  const rawImplB = mlToProb(mktMLB);
+
+  // FIX 1: Remove vig — normalize to true no-vig probabilities
+  // Sum of implied probs > 100% due to vig (typically 103-108%)
+  const vigTotal = rawImplA + rawImplB;
+  const noVigA = rawImplA / vigTotal;
+  const noVigB = rawImplB / vigTotal;
+
+  // FIX 2: Close-game skew — when projected margin is tight (within 5pts),
+  // the favorite wins close games ~3% more often than a symmetric model suggests.
+  // This reflects late-game execution, FT shooting, and coaching advantages.
+  // Only applied to ML win probability, not to spread/total calculations.
+  let mlWinProbA = winProbA;
+  const absMargin = Math.abs(projectedMargin || 0);
+  if (absMargin <= 5 && absMargin > 0) {
+    // Determine who the model favorite is
+    const favoriteIsA = projectedMargin > 0;
+    // Scale the skew: bigger at 1pt margin, smaller at 5pt
+    const skew = 0.03 * (1 - absMargin / 6); // max +3% at margin=0, tapering to 0% at margin=6
+    if (favoriteIsA) {
+      mlWinProbA = Math.min(0.98, mlWinProbA + skew);
+    } else {
+      mlWinProbA = Math.max(0.02, mlWinProbA - skew);
+    }
+  }
+  const mlWinProbB = 1 - mlWinProbA;
+
+  // EV calculation: model prob vs no-vig market prob
+  const evA = mlWinProbA - noVigA;
+  const evB = mlWinProbB - noVigB;
+
+  let mlSide, mlEdgePct, mlLine;
+  if (evA > evB && evA > 0) {
+    mlSide = 'A';
+    mlEdgePct = evA * 100;
+    mlLine = mktMLA;
+  } else if (evB > 0) {
+    mlSide = 'B';
+    mlEdgePct = evB * 100;
+    mlLine = mktMLB;
+  } else {
+    mlSide = null;
+    mlEdgePct = Math.max(evA, evB) * 100;
+    mlLine = 0;
+  }
+
+  return { mlSide, mlEdgePct, mlLine, implProbA: rawImplA, implProbB: rawImplB, noVigA, noVigB, mlWinProbA, mlWinProbB, evA: evA*100, evB: evB*100 };
+}
+
+// ---- MONTE CARLO SIMULATION ----
+function runMonteCarlo(model, mktSp, mktTo, nSims) {
+  const { ptsA, ptsB, poss } = model;
+
+  // Std dev: ~11% of projected score per team
+  const sdA = ptsA * 0.11;
+  const sdB = ptsB * 0.11;
+  // Shared pace variance: ~4% of possessions — creates score correlation
+  const sdPace = poss * 0.04;
+
+  // Box-Muller transform for normal random
+  function randn() {
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+
+  let winsA = 0, coversA = 0, overs = 0;
+  let sumMargin = 0, sumTotal = 0;
+
+  // Histogram binning on the fly (no arrays stored)
+  const BIN_COUNT = 60;
+  const BIN_MIN = -50, BIN_MAX = 50; // margin range
+  const BIN_WIDTH = (BIN_MAX - BIN_MIN) / BIN_COUNT;
+  const bins = new Int32Array(BIN_COUNT);
+
+  for (let i = 0; i < nSims; i++) {
+    // Shared pace shock — both teams affected by same game flow
+    const paceShock = randn() * sdPace;
+    const paceMultA = (poss + paceShock) / poss;
+    const paceMultB = (poss + paceShock) / poss;
+
+    const simA = Math.max(30, ptsA * paceMultA + randn() * sdA);
+    const simB = Math.max(30, ptsB * paceMultB + randn() * sdB);
+    const margin = simA - simB;
+    const total = simA + simB;
+
+    sumMargin += margin;
+    sumTotal += total;
+
+    // Bin the margin for histogram
+    const binIdx = Math.min(BIN_COUNT - 1, Math.max(0, Math.floor((margin - BIN_MIN) / BIN_WIDTH)));
+    bins[binIdx]++;
+
+    if (simA > simB) winsA++;
+    if (margin > -mktSp) coversA++;
+    if (total > mktTo) overs++;
+  }
+
+  const winProbA = winsA / nSims;
+  const coverProbA = coversA / nSims;
+  const overProb = overs / nSims;
+  const avgMargin = sumMargin / nSims;
+  const avgTotal = sumTotal / nSims;
+
+  return {
+    winProbA, coverProbA, overProb,
+    avgMargin, avgTotal,
+    bins, BIN_COUNT, BIN_MIN, BIN_MAX, BIN_WIDTH,
+    sdA, sdB
+  };
+}
+
+// ---- RACE TO 5 / RACE TO 10 ----
+// Analytical model: probability of reaching target first based on scoring rates
+function computeRace(model) {
+  const { ortgA, ortgB } = model;
+
+  // Scoring rate per possession (0 to ~1.3)
+  const rateA = ortgA / 100;
+  const rateB = ortgB / 100;
+
+  // For race-to-N: the probability A reaches N first is approximately
+  // P(A) = rateA^N / (rateA^N + rateB^N) adjusted for alternating possessions.
+  // More precisely, use the ratio of scoring efficiencies raised to target power
+  // to model the compounding advantage over multiple possessions.
+  function raceProb(rA, rB, target) {
+    // Each possession: P(score) ≈ rate * 0.92 (since ~8% of possessions are turnovers with 0 pts)
+    const pScoreA = rA * 0.92;
+    const pScoreB = rB * 0.92;
+    // Geometric model: P(A first to N) ≈ pA^k / (pA^k + pB^k) where k scales with target
+    // k represents the "amplification" — higher targets separate teams more
+    const k = target / 2.5; // 5pts → k=2, 10pts → k=4
+    const powA = Math.pow(pScoreA, k);
+    const powB = Math.pow(pScoreB, k);
+    return powA / (powA + powB);
+  }
+
+  const race5A = raceProb(rateA, rateB, 5);
+  const race10A = raceProb(rateA, rateB, 10);
+
+  function probToML(p) {
+    if (p >= 0.5) return Math.round(-100 * p / (1 - p));
+    return Math.round(100 * (1 - p) / p);
+  }
+
+  return {
+    race5A, race5B: 1 - race5A,
+    race10A, race10B: 1 - race10A,
+    ml5A: probToML(race5A), ml5B: probToML(1 - race5A),
+    ml10A: probToML(race10A), ml10B: probToML(1 - race10A),
+  };
+}
+
+// ---- BET SIZING ----
+function getBetSize(val, bankroll, mode) {
+  if (mode === 'ml') {
+    // ML uses EV%: 3/5/7/10
+    if (val >= 10) return { pct: 20, amt: bankroll * 0.20 };
+    if (val >= 7) return { pct: 15, amt: bankroll * 0.15 };
+    if (val >= 5) return { pct: 12, amt: bankroll * 0.12 };
+    if (val >= 3) return { pct: 8, amt: bankroll * 0.08 };
+    return { pct: 5, amt: bankroll * 0.05 };
+  }
+  // Spread/1H: 2/3/4/6   Total: 3/4/5/7
+  if (mode === 'total') {
+    if (val >= 7) return { pct: 20, amt: bankroll * 0.20 };
+  } else {
+    if (val >= 6) return { pct: 20, amt: bankroll * 0.20 };
+  }
+  if (val >= 4) return { pct: 15, amt: bankroll * 0.15 };
+  if (val >= 3) return { pct: 12, amt: bankroll * 0.12 };
+  if (val >= 2) return { pct: 8, amt: bankroll * 0.08 };
+  return { pct: 5, amt: bankroll * 0.05 };
+}
+
+// ---- VERDICT RENDERING ----
+// For spread/1H: thresholds are RAW POINTS (2/3/4)
+// For totals: thresholds are RAW POINTS (3/4/5) — higher noise floor
+// For moneyline: thresholds are EV PERCENTAGE (3/5/7)
+function getEdgeClass(val, mode) {
+  if (mode === 'ml') {
+    if (val >= 10) return 'bet-9';
+    if (val >= 7) return 'bet-7';
+    if (val >= 5) return 'bet-5';
+    if (val >= 3) return 'bet-3';
+    return '';
+  }
+  if (mode === 'total') {
+    if (val >= 7) return 'bet-9';  // purple
+    if (val >= 5) return 'bet-7';  // lime green
+    if (val >= 4) return 'bet-5';  // light blue
+    if (val >= 3) return 'bet-3';  // yellow
+    return '';
+  }
+  // Spread/1H: 2pt / 3pt / 4pt / 6pt
+  if (val >= 6) return 'bet-9';
+  if (val >= 4) return 'bet-7';
+  if (val >= 3) return 'bet-5';
+  if (val >= 2) return 'bet-3';
+  return '';
+}
+
+function getEdgeLabel(val, mode) {
+  if (mode === 'ml') {
+    if (val >= 10) return '🟣 BET — Premium Edge';
+    if (val >= 7) return '🟢 BET';
+    if (val >= 5) return '🔵 BET';
+    if (val >= 3) return '🟡 BET';
+    return '❌ PASS';
+  }
+  if (mode === 'total') {
+    if (val >= 7) return '🟣 BET — Premium Edge';
+    if (val >= 5) return '🟢 BET';
+    if (val >= 4) return '🔵 BET';
+    if (val >= 3) return '🟡 BET';
+    return '❌ PASS';
+  }
+  if (val >= 6) return '🟣 BET — Premium Edge';
+  if (val >= 4) return '🟢 BET';
+  if (val >= 3) return '🔵 BET';
+  if (val >= 2) return '🟡 BET';
+  return '❌ PASS';
+}
+
+function isBettable(val, mode, absMktSp) {
+  if (mode === 'ml') return val >= 3;       // ML: ≥3% EV
+  if (mode === 'total') return val >= 3;     // Totals: ≥3pt (more noise than spreads)
+  // Spread/1H: blowouts (14+) need ≥3pt edge due to higher variance
+  if (absMktSp && absMktSp >= 14) return val >= 3;
+  return val >= 2;                           // Spread/1H: ≥2pt
+}
+
+// Bet sizing also respects total's higher threshold
+function getBetSizeForTotal(val, bankroll) {
+  if (val >= 5) return { pct: 15, amt: bankroll * 0.15 };
+  if (val >= 4) return { pct: 12, amt: bankroll * 0.12 };
+  if (val >= 3) return { pct: 8, amt: bankroll * 0.08 };
+  return { pct: 5, amt: bankroll * 0.05 };
+}
+
+function formatSpread(n) {
+  if (n > 0) return '+' + n.toFixed(1);
+  return n.toFixed(1);
+}
+
+function formatML(n) {
+  if (n > 0) return '+' + n;
+  return '' + n;
+}
+
+// ---- MAIN CALCULATE ----
+function calculate() {
+  const tA = STATE.selectedA;
+  const tB = STATE.selectedB;
+  if (!tA || !tB) { alert('Select both teams from the autocomplete dropdown.'); return; }
+  if (tA.name === tB.name) { alert('Select two different teams.'); return; }
+
+  const site = document.getElementById('gameSite').value;
+  const mktSp = parseFloat(document.getElementById('mktSpread').value);
+  const mktTo = parseFloat(document.getElementById('mktTotal').value);
+  const mktMLA = parseFloat(document.getElementById('mktMLA').value) || 0;
+  const mktMLB = parseFloat(document.getElementById('mktMLB').value) || 0;
+  const br = parseFloat(document.getElementById('bankrollInput').value) || 1000;
+  STATE.bankroll = br;
+  if (STATE.betLog.length === 0) STATE.startingBankroll = br;
+
+  if (isNaN(mktSp) || isNaN(mktTo)) { alert('Enter market spread and total.'); return; }
+
+  // Manual adjustments (injuries, momentum, eye test)
+  const adjA = parseFloat(document.getElementById('adjA').value) || 0;
+  const adjB = parseFloat(document.getElementById('adjB').value) || 0;
+
+  // Run model
+  const model = computeModel(tA, tB, site, mktSp, mktTo, adjA, adjB);
+  const edges = computeEdges(model, mktSp, mktTo);
+
+  // Monte Carlo
+  const mc = runMonteCarlo(model, mktSp, mktTo, STATE.mcSims);
+
+  // ML edge — uses no-vig probabilities and close-game skew (isolated from spread/total)
+  const mlEdge = computeMLEdge(mc.winProbA, mktMLA, mktMLB, model.blendedMargin);
+
+  // Race
+  const race = computeRace(model);
+
+  // Store last result
+  STATE.lastResult = { tA, tB, model, edges, mc, mlEdge, race, mktSp, mktTo, mktMLA, mktMLB, br };
+
+  // ---- RENDER ----
+  document.getElementById('resultsSection').classList.add('show');
+
+  // Raw Score
+  document.getElementById('scoreNameA').textContent = tA.name;
+  document.getElementById('scoreNameB').textContent = tB.name;
+  document.getElementById('scorePtsA').textContent = Math.round(model.ptsA);
+  document.getElementById('scorePtsB').textContent = Math.round(model.ptsB);
+
+  // Highlight raw winner in green
+  const pA = Math.round(model.ptsA), pB = Math.round(model.ptsB);
+  document.getElementById('scorePtsA').style.color = pA > pB ? 'var(--accent)' : 'var(--text)';
+  document.getElementById('scoreNameA').style.color = pA > pB ? 'var(--accent)' : 'var(--text-dim)';
+  document.getElementById('scorePtsB').style.color = pB > pA ? 'var(--accent)' : 'var(--text)';
+  document.getElementById('scoreNameB').style.color = pB > pA ? 'var(--accent)' : 'var(--text-dim)';
+
+  // Blended Score: derived from blendedMargin + blendedTotal
+  // blendedTotal = ptsA_b + ptsB_b, blendedMargin = ptsA_b - ptsB_b
+  const blendPtsA = Math.round((model.blendedTotal + model.blendedMargin) / 2);
+  const blendPtsB = Math.round((model.blendedTotal - model.blendedMargin) / 2);
+  document.getElementById('blendNameA').textContent = tA.name;
+  document.getElementById('blendNameB').textContent = tB.name;
+  document.getElementById('blendPtsA').textContent = blendPtsA;
+  document.getElementById('blendPtsB').textContent = blendPtsB;
+
+  // Highlight blended winner
+  document.getElementById('blendPtsA').style.color = blendPtsA > blendPtsB ? 'var(--gold)' : 'var(--text-dim)';
+  document.getElementById('blendNameA').style.color = blendPtsA > blendPtsB ? 'var(--gold)' : 'var(--text-muted)';
+  document.getElementById('blendPtsB').style.color = blendPtsB > blendPtsA ? 'var(--gold)' : 'var(--text-dim)';
+  document.getElementById('blendNameB').style.color = blendPtsB > blendPtsA ? 'var(--gold)' : 'var(--text-muted)';
+
+  // Conference power mismatch flag
+  const POWER_CONFS = ['b12','sec','be','b10','acc'];
+  const confA = (tA.conf || '').toLowerCase();
+  const confB = (tB.conf || '').toLowerCase();
+  const isPowerA = POWER_CONFS.includes(confA);
+  const isPowerB = POWER_CONFS.includes(confB);
+  const confTagEl = document.getElementById('confTag');
+  if (isPowerA !== isPowerB) {
+    const powerTeam = isPowerA ? tA.name : tB.name;
+    const midTeam = !isPowerA ? tA.name : tB.name;
+    const midConf = !isPowerA ? tA.conf : tB.conf;
+    confTagEl.style.display = '';
+    confTagEl.innerHTML = `⚠️ <b>Non-Power vs Power</b> — ${midTeam} (${midConf}) has not faced the tournament-level competition that ${powerTeam} sees weekly. ${midTeam}'s efficiency stats may be inflated against weaker schedules.`;
+  } else {
+    confTagEl.style.display = 'none';
+  }
+
+  // SPREAD VERDICT — uses raw point edge (blowouts 14+ need ≥3pt)
+  renderVerdict('Spread', edges.spreadEdge, edges.spreadSide === 'A' ? tA.name : tB.name,
+    formatSpread(edges.spreadLine), edges.spreadEdge.toFixed(1) + 'pt edge',
+    `Model: ${formatSpread(model.modelSpread)} | Mkt: ${formatSpread(mktSp)} | Cover prob: ${((edges.spreadSide === 'A' ? mc.coverProbA : 1-mc.coverProbA)*100).toFixed(1)}%`,
+    br, 'pts', Math.abs(mktSp));
+
+  // TOTAL VERDICT — uses raw point edge, ≥3pt minimum (higher noise than spreads)
+  renderVerdict('Total', edges.totalEdge, '',
+    edges.totalSide + ' ' + mktTo, edges.totalEdge.toFixed(1) + 'pt edge',
+    `Model total: ${model.blendedTotal.toFixed(1)} | Mkt: ${mktTo} | Over prob: ${(mc.overProb*100).toFixed(1)}%`,
+    br, 'total');
+
+  // ML VERDICT — uses EV percentage, only fires if spread also agrees (Fix 3)
+  const spreadHasEdge = isBettable(edges.spreadEdge, 'pts', Math.abs(mktSp)); // spread ≥ 2pt (3pt for blowouts)
+  if (mlEdge.mlSide && spreadHasEdge) {
+    // Fix 3: ML side must agree with spread side direction
+    const spreadFavorsA = edges.spreadSide === 'A';
+    const mlFavorsA = mlEdge.mlSide === 'A';
+    if (spreadFavorsA === mlFavorsA) {
+      const mlName = mlEdge.mlSide === 'A' ? tA.name : tB.name;
+      const mlWinProb = mlEdge.mlSide === 'A' ? mlEdge.mlWinProbA : mlEdge.mlWinProbB;
+      const noVigProb = mlEdge.mlSide === 'A' ? mlEdge.noVigA : mlEdge.noVigB;
+      renderVerdict('ML', mlEdge.mlEdgePct, mlName,
+        formatML(mlEdge.mlLine), mlEdge.mlEdgePct.toFixed(1) + '% EV edge',
+        `Win prob: ${(mlWinProb*100).toFixed(1)}% | No-vig: ${(noVigProb*100).toFixed(1)}% | Vig removed: ${((mlEdge.implProbA+mlEdge.implProbB-1)*100).toFixed(1)}%`,
+        br, 'ml');
+    } else {
+      // ML and spread disagree — don't bet ML
+      clearVerdict('ML');
+      document.getElementById('vcMLLine').textContent = 'Spread & ML disagree';
+      document.getElementById('vcMLDetail').textContent = `Spread favors ${edges.spreadSide === 'A' ? tA.name : tB.name}, ML leans ${mlEdge.mlSide === 'A' ? tA.name : tB.name} — conflicting signals, pass.`;
+    }
+  } else if (mlEdge.mlSide && !spreadHasEdge) {
+    clearVerdict('ML');
+    document.getElementById('vcMLLine').textContent = 'No spread confirmation';
+    document.getElementById('vcMLDetail').textContent = `ML shows ${mlEdge.mlEdgePct.toFixed(1)}% EV but spread edge is only ${edges.spreadEdge.toFixed(1)}pt (need ≥2pt). ML requires spread agreement.`;
+  } else {
+    clearVerdict('ML');
+  }
+
+  // FIRST HALF VERDICT — only calculates when 1H market spread is provided
+  const mkt1HSp = parseFloat(document.getElementById('mkt1HSpread').value);
+  if (!isNaN(mkt1HSp) && mkt1HSp !== 0) {
+    // Use actual market 1H spread instead of estimating
+    const fhModelMargin = -model.fhSpread; // positive = A wins 1H
+    const fhMktMargin = -mkt1HSp;
+    const fhDiff = fhModelMargin - fhMktMargin;
+    const fhEdge = Math.abs(fhDiff);
+    const fhSide = fhDiff >= 0 ? 'A' : 'B';
+    const fhName = fhSide === 'A' ? tA.name : tB.name;
+    const fhLine = fhSide === 'A' ? mkt1HSp : -mkt1HSp;
+    renderVerdict('FH', fhEdge, fhName,
+      formatSpread(fhLine), fhEdge.toFixed(1) + 'pt edge',
+      `Model 1H spread: ${formatSpread(model.fhSpread)} | Mkt 1H: ${formatSpread(mkt1HSp)}`,
+      br, 'pts');
+  } else {
+    // No 1H spread entered — show inactive state
+    clearVerdict('FH');
+    document.getElementById('vcFHLine').textContent = 'Enter 1H spread to calculate';
+    document.getElementById('vcFHDetail').textContent = `Model 1H projection: ${formatSpread(model.fhSpread)}`;
+  }
+
+  // BREAKDOWN
+  renderBreakdown(model, edges, mc, tA, tB, mktSp, mktTo);
+
+  // MONTE CARLO
+  renderMC(mc, mktSp, mktTo, tA, tB);
+
+  // RACE
+  renderRace(race, tA, tB);
+
+  // LIVE TRIPWIRES
+  renderTripwires(model, edges, tA, tB, mktSp, mktTo);
+
+  // RECENT GAMES & HEAD TO HEAD
+  fetchAndRenderRecent(tA, tB);
+
+  // Render log checkboxes for bet selection
+  renderLogCheckboxes();
+
+  // Scroll to results
+  document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderVerdict(type, edgeVal, sideName, lineStr, edgeStr, detailStr, bankroll, mode, absMktSp) {
+  const prefixMap = { 'Spread':'vcSpread', 'Total':'vcTotal', 'ML':'vcML', 'FH':'vcFH', 'FHML':'vcFHML' };
+  const prefix = prefixMap[type] || 'vcFH';
+  const card = document.getElementById(prefix);
+  const btn = document.getElementById(prefix + 'Btn');
+  const line = document.getElementById(prefix + 'Line');
+  const edge = document.getElementById(prefix + 'Edge');
+  const detail = document.getElementById(prefix + 'Detail');
+
+  // For blowout spreads (14+), shift thresholds up by 1pt for display
+  let displayEdge = edgeVal;
+  let displayMode = mode;
+  if (mode === 'pts' && absMktSp && absMktSp >= 14) {
+    // Remap: need ≥3pt to get yellow (was ≥2pt), ≥4pt for blue (was ≥3pt), etc.
+    displayEdge = Math.max(0, edgeVal - 1);
+  }
+  const cls = getEdgeClass(displayEdge, mode);
+  const label = getEdgeLabel(displayEdge, mode);
+
+  card.className = 'verdict-card ' + (cls || 'no-bet');
+  btn.className = 'verdict-btn ' + (cls || 'pass');
+  btn.textContent = label;
+  line.textContent = sideName + ' ' + lineStr;
+  edge.textContent = edgeStr;
+
+  if (isBettable(edgeVal, mode, absMktSp)) {
+    const bet = mode === 'total' ? getBetSizeForTotal(edgeVal, bankroll) : getBetSize(edgeVal, bankroll, mode);
+    detail.textContent = detailStr + ` | Bet $${Math.round(bet.amt)} (${bet.pct}%)`;
+  } else {
+    detail.textContent = detailStr;
+  }
+}
+
+function clearVerdict(type) {
+  const prefixMap = { 'ML':'vcML', 'FH':'vcFH', 'FHML':'vcFHML' };
+  const prefix = prefixMap[type] || 'vcFH';
+  document.getElementById(prefix).className = 'verdict-card no-bet';
+  document.getElementById(prefix + 'Btn').className = 'verdict-btn pass';
+  document.getElementById(prefix + 'Btn').textContent = '❌ PASS';
+  document.getElementById(prefix + 'Line').textContent = 'No edge detected';
+  document.getElementById(prefix + 'Edge').textContent = '—';
+  document.getElementById(prefix + 'Detail').textContent = '';
+}
+
+function renderBreakdown(model, edges, mc, tA, tB, mktSp, mktTo) {
+  const grid = document.getElementById('breakdownGrid');
+  const items = [
+    { label: 'Possessions', value: model.poss.toFixed(1), sub: model.tempoDiff >= 5 ? 'Harmonic mean (tempo gap ≥5)' : 'Geometric mean' },
+    { label: 'ORtg A', value: model.ortgA.toFixed(1), sub: `${tA.name} vs ${tB.name} D` },
+    { label: 'ORtg B', value: model.ortgB.toFixed(1), sub: `${tB.name} vs ${tA.name} D` },
+    { label: 'Raw Spread', value: formatSpread(-model.rawSpread), sub: 'Before market blend' },
+    { label: 'My Spread', value: formatSpread(model.modelSpread), sub: `Blended (${((1-model.bW)*100).toFixed(0)}% model / ${(model.bW*100).toFixed(0)}% mkt)` },
+    { label: 'My Total', value: model.blendedTotal.toFixed(1), sub: `Blended (${((1-model.bWT)*100).toFixed(0)}% model / ${(model.bWT*100).toFixed(0)}% mkt)` },
+    { label: 'Win Prob A', value: (mc.winProbA * 100).toFixed(1) + '%', sub: `${tA.name} (MC ${STATE.mcSims.toLocaleString()} sims)` },
+    { label: 'Cover Prob A', value: (mc.coverProbA * 100).toFixed(1) + '%', sub: `${tA.name} covers ${formatSpread(mktSp)}` },
+    { label: 'Over Prob', value: (mc.overProb * 100).toFixed(1) + '%', sub: `Over ${mktTo}` },
+    { label: 'Avg Margin (MC)', value: mc.avgMargin.toFixed(1), sub: 'A wins by (MC avg)' },
+    { label: 'Avg Total (MC)', value: mc.avgTotal.toFixed(1), sub: 'MC simulation avg' },
+    { label: 'Blend Weight', value: (model.bW * 100).toFixed(0) + '% mkt', sub: `Spread magnitude: ${Math.abs(mktSp)}` },
+  ];
+
+  // Manual adjustments — show only when non-zero
+  if (model.adjA !== 0) items.push({ label: 'Adj — ' + tA.name, value: (model.adjA > 0 ? '+' : '') + model.adjA.toFixed(1), sub: 'Manual: injury / momentum / eye test', warn: model.adjA < 0 });
+  if (model.adjB !== 0) items.push({ label: 'Adj — ' + tB.name, value: (model.adjB > 0 ? '+' : '') + model.adjB.toFixed(1), sub: 'Manual: injury / momentum / eye test', warn: model.adjB < 0 });
+
+  // Luck — always show for both teams
+  const luckA = tA.luck || 0;
+  const luckB = tB.luck || 0;
+  const luckAVal = (luckA >= 0 ? '+' : '') + luckA.toFixed(3);
+  const luckBVal = (luckB >= 0 ? '+' : '') + luckB.toFixed(3);
+  const luckASub = luckA > 0.030 ? 'Regression candidate — record exceeds expected wins' : luckA < -0.020 ? 'Undervalued — better than record suggests' : 'Neutral — record matches expected wins';
+  const luckBSub = luckB > 0.030 ? 'Regression candidate — record exceeds expected wins' : luckB < -0.020 ? 'Undervalued — better than record suggests' : 'Neutral — record matches expected wins';
+  items.push({ label: 'Luck — ' + tA.name, value: luckAVal, sub: luckASub, warn: luckA > 0.030 });
+  items.push({ label: 'Luck — ' + tB.name, value: luckBVal, sub: luckBSub, warn: luckB > 0.030 });
+
+  grid.innerHTML = items.map(i => `
+    <div class="breakdown-card" ${i.warn ? 'style="border-color:var(--orange)"' : i.good ? 'style="border-color:var(--accent)"' : ''}>
+      <div class="breakdown-label">${i.label}</div>
+      <div class="breakdown-value" ${i.warn ? 'style="color:var(--orange)"' : i.good ? 'style="color:var(--accent)"' : ''}>${i.value}</div>
+      <div class="breakdown-sub">${i.sub}</div>
+    </div>
+  `).join('') + `
+  <div style="grid-column:1/-1;padding:14px 16px;background:var(--bg);border-radius:var(--radius);font-size:12px;line-height:1.7;color:var(--text-dim);margin-top:4px">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">How to read this</div>
+    <b style="color:var(--text)">Possessions</b> — Projected game pace. Uses harmonic mean when tempo gap is ≥5 (slower team controls pace), geometric mean otherwise. Directly drives the total projection — more possessions = more points.<br>
+    <b style="color:var(--text)">ORtg A / ORtg B</b> — Each team's expected points per 100 possessions against this specific opponent's defense. Calculated as (AdjO × AdjD) / National Avg. This is the matchup-adjusted efficiency, not season averages.<br>
+    <b style="color:var(--text)">Raw Spread</b> — Pure model projection before any market influence. This is what KenPom efficiency says the margin should be.<br>
+    <b style="color:var(--text)">My Spread / My Total</b> — The number the model actually uses for verdicts. Blends your raw projection with the market line (65% model / 35% market by default, shifting toward market in blowout territory). The market acts as a sanity check — your edge is in where it's wrong, not in ignoring it.<br>
+    <b style="color:var(--text)">Blend Weight</b> — How much the market influences your blended line. Under 14pt spreads: 35% market. 14–19pt: 55%. 20–24pt: 65%. 25+: 70%. Bigger spreads are harder to project, so the model defers more to the market.<br>
+    <b style="color:var(--text)">Luck ⚠️/✅</b> — KenPom's measure of wins above/below expectation. Orange = team has been lucky (regression candidate, fade in high-stakes spots). Green = team is unlucky (undervalued, their stats are better than their record).
+  </div>`;
+}
+
+// ---- MONTE CARLO RENDERING ----
+function renderMC(mc, mktSp, mktTo, tA, tB) {
+  const statsEl = document.getElementById('mcStats');
+  statsEl.innerHTML = `
+    <div class="mc-stat">
+      <div class="mc-stat-label">${tA.name} Win</div>
+      <div class="mc-stat-value" style="color:var(--accent)">${(mc.winProbA*100).toFixed(1)}%</div>
+    </div>
+    <div class="mc-stat">
+      <div class="mc-stat-label">${tA.name} Cover</div>
+      <div class="mc-stat-value" style="color:var(--gold)">${(mc.coverProbA*100).toFixed(1)}%</div>
+    </div>
+    <div class="mc-stat">
+      <div class="mc-stat-label">Over ${mktTo}</div>
+      <div class="mc-stat-value" style="color:var(--blue)">${(mc.overProb*100).toFixed(1)}%</div>
+    </div>
+    <div class="mc-stat">
+      <div class="mc-stat-label">Avg Margin</div>
+      <div class="mc-stat-value" style="color:var(--text)">${mc.avgMargin > 0 ? '+' : ''}${mc.avgMargin.toFixed(1)}</div>
+    </div>
+  `;
+
+  // Draw histogram of margins (pre-binned)
+  drawHistogram('mcCanvas', mc, mktSp, tA.name, tB.name);
+}
+
+function drawHistogram(canvasId, mc, mktSp, nameA, nameB) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const { bins, BIN_COUNT, BIN_MIN, BIN_MAX, BIN_WIDTH } = mc;
+  let maxBin = 0;
+  for (let i = 0; i < BIN_COUNT; i++) { if (bins[i] > maxBin) maxBin = bins[i]; }
+  if (maxBin === 0) return;
+
+  const pad = 20;
+  const chartW = W - pad * 2;
+  const chartH = H - pad * 2;
+  const barW = chartW / BIN_COUNT;
+
+  // Draw bars
+  for (let i = 0; i < BIN_COUNT; i++) {
+    const x = pad + i * barW;
+    const h = (bins[i] / maxBin) * chartH;
+    const y = H - pad - h;
+    const midVal = BIN_MIN + (i + 0.5) * BIN_WIDTH;
+
+    ctx.fillStyle = midVal > 0 ? '#00d4aa60' : '#ff4d6a40';
+    ctx.fillRect(x, y, barW - 1, h);
+  }
+
+  // Draw spread line
+  if (mktSp !== 0) {
+    const spreadVal = -mktSp; // convert to margin convention
+    const spreadX = pad + ((spreadVal - BIN_MIN) / (BIN_MAX - BIN_MIN)) * chartW;
+    ctx.strokeStyle = '#f5c542';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(spreadX, pad);
+    ctx.lineTo(spreadX, H - pad);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#f5c542';
+    ctx.font = '10px JetBrains Mono';
+    ctx.fillText('Spread', spreadX + 4, pad + 10);
+  }
+
+  // Zero line
+  const zeroX = pad + ((0 - BIN_MIN) / (BIN_MAX - BIN_MIN)) * chartW;
+  ctx.strokeStyle = '#ffffff30';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(zeroX, pad);
+  ctx.lineTo(zeroX, H - pad);
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = '#8892a8';
+  ctx.font = '10px JetBrains Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText(nameB + ' wins ←', pad + 60, H - 4);
+  ctx.fillText('→ ' + nameA + ' wins', W - pad - 60, H - 4);
+}
+
+// ---- LIVE BET TRIPWIRES ----
+function renderTripwires(model, edges, tA, tB, mktSp, mktTo) {
+  const section = document.getElementById('tripwireSection');
+  const grid = document.getElementById('tripwireGrid');
+  const modelMargin = model.blendedMargin;
+  const modelTotal = model.blendedTotal;
+
+  section.style.display = '';
+
+  // Tiers: 3/4.5/6/9 spacing from green threshold
+  const GREEN_SPREAD = 4;
+  const GREEN_TOTAL = 5;
+
+  const spreadTiers = [
+    { targetEdge: GREEN_SPREAD, label: '🟡 BET', css: 'color:var(--yellow)', sizing: '8% bankroll' },
+    { targetEdge: GREEN_SPREAD + 3, label: '🔵 BET', css: 'color:var(--blue)', sizing: '12% bankroll' },
+    { targetEdge: GREEN_SPREAD + 4.5, label: '🟢 NUKE', css: 'color:var(--lime)', sizing: '15% bankroll' },
+    { targetEdge: GREEN_SPREAD + 9, label: '🟣 HIROSHIMA', css: 'color:#b388ff', sizing: '20% bankroll' },
+  ];
+  const totalTiers = [
+    { targetEdge: GREEN_TOTAL, label: '🟡 BET', css: 'color:var(--yellow)', sizing: '8% bankroll' },
+    { targetEdge: GREEN_TOTAL + 3, label: '🔵 BET', css: 'color:var(--blue)', sizing: '12% bankroll' },
+    { targetEdge: GREEN_TOTAL + 4.5, label: '🟢 NUKE', css: 'color:var(--lime)', sizing: '15% bankroll' },
+    { targetEdge: GREEN_TOTAL + 9, label: '🟣 HIROSHIMA', css: 'color:#b388ff', sizing: '20% bankroll' },
+  ];
+
+  // Round to nearest half-point (what sportsbooks actually set)
+  function roundHalf(n) { return Math.round(n * 2) / 2; }
+
+  function getLiveSpread(side, targetEdge) {
+    if (side === 'A') return roundHalf(-(modelMargin - targetEdge));
+    else return roundHalf(-(modelMargin + targetEdge));
+  }
+
+  function getLiveTotal(side, targetEdge) {
+    if (side === 'OVER') return roundHalf(modelTotal - targetEdge);
+    else return roundHalf(modelTotal + targetEdge);
+  }
+
+  function renderColumn(title, subtitle, tiers, calcFn, formatFn) {
+    let col = '<div>' +
+      '<div style="font-family:var(--mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">' + title + '</div>' +
+      '<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-bottom:8px">' + subtitle + '</div>';
+    for (const tier of tiers) {
+      const display = formatFn(calcFn(tier.targetEdge));
+      const borderColor = tier.css.replace('color:','').replace(';','');
+      col += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--surface2);border-radius:var(--radius);margin-bottom:5px;border-left:3px solid ' + borderColor + '">' +
+        '<div>' +
+          '<span style="' + tier.css + ';font-weight:700;font-size:12px">' + tier.label + '</span>' +
+          '<span style="color:var(--text-muted);font-size:10px;margin-left:6px">' + tier.sizing + '</span>' +
+        '</div>' +
+        '<div style="text-align:right">' +
+          '<span style="color:var(--text);font-weight:700;font-family:var(--mono);font-size:14px">' + display + '</span>' +
+          '<span style="color:var(--text-muted);font-size:10px;margin-left:4px">' + tier.targetEdge + 'pt</span>' +
+        '</div>' +
+      '</div>';
+    }
+    col += '</div>';
+    return col;
+  }
+
+  const edgeA = Math.max(0, modelMargin - (-mktSp));
+  const edgeB = Math.max(0, (-mktSp) - modelMargin);
+  const edgeOver = Math.max(0, modelTotal - mktTo);
+  const edgeUnder = Math.max(0, mktTo - modelTotal);
+
+  let html = '';
+
+  html += renderColumn(
+    'SPREAD — ' + tA.name,
+    'Model: ' + formatSpread(-modelMargin) + ' · Mkt: ' + formatSpread(mktSp) + ' · Edge: ' + edgeA.toFixed(1) + 'pt',
+    spreadTiers,
+    function(te) { return getLiveSpread('A', te); },
+    function(lv) { return tA.name + ' ' + formatSpread(lv); }
+  );
+
+  html += renderColumn(
+    'SPREAD — ' + tB.name,
+    'Model: ' + formatSpread(modelMargin) + ' · Mkt: ' + formatSpread(-mktSp) + ' · Edge: ' + edgeB.toFixed(1) + 'pt',
+    spreadTiers,
+    function(te) { return getLiveSpread('B', te); },
+    function(lv) { return tB.name + ' ' + formatSpread(-lv); }
+  );
+
+  html += renderColumn(
+    'TOTAL — OVER',
+    'Model: ' + modelTotal.toFixed(1) + ' · Mkt: ' + mktTo + ' · Edge: ' + edgeOver.toFixed(1) + 'pt',
+    totalTiers,
+    function(te) { return getLiveTotal('OVER', te); },
+    function(lv) { return 'OVER ' + lv.toFixed(1); }
+  );
+
+  html += renderColumn(
+    'TOTAL — UNDER',
+    'Model: ' + modelTotal.toFixed(1) + ' · Mkt: ' + mktTo + ' · Edge: ' + edgeUnder.toFixed(1) + 'pt',
+    totalTiers,
+    function(te) { return getLiveTotal('UNDER', te); },
+    function(lv) { return 'UNDER ' + lv.toFixed(1); }
+  );
+
+  // ---- 1ST HALF SPREAD TRIPWIRES ----
+  const fhMargin = -model.fhSpread; // positive = A wins 1H by this
+  const fhModelSpread = model.fhSpread; // negative = A favored
+  const fhMktSp = mktSp * 0.53; // estimated 1H market spread
+
+  function getLive1HSpread(side, targetEdge) {
+    if (side === 'A') return roundHalf(-(fhMargin - targetEdge));
+    else return roundHalf(-(fhMargin + targetEdge));
+  }
+
+  const fhEdgeA = Math.max(0, fhMargin - (-fhMktSp));
+  const fhEdgeB = Math.max(0, (-fhMktSp) - fhMargin);
+
+  html += renderColumn(
+    '1H SPREAD — ' + tA.name,
+    '1H Model: ' + formatSpread(fhModelSpread) + ' · Est 1H Mkt: ' + formatSpread(fhMktSp) + ' · Edge: ' + fhEdgeA.toFixed(1) + 'pt',
+    spreadTiers,
+    function(te) { return getLive1HSpread('A', te); },
+    function(lv) { return tA.name + ' 1H ' + formatSpread(lv); }
+  );
+
+  html += renderColumn(
+    '1H SPREAD — ' + tB.name,
+    '1H Model: ' + formatSpread(-fhModelSpread) + ' · Est 1H Mkt: ' + formatSpread(-fhMktSp) + ' · Edge: ' + fhEdgeB.toFixed(1) + 'pt',
+    spreadTiers,
+    function(te) { return getLive1HSpread('B', te); },
+    function(lv) { return tB.name + ' 1H ' + formatSpread(-lv); }
+  );
+
+  grid.innerHTML = html;
+  grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+}
+
+// ---- RACE RENDERING ----
+function renderRace(race, tA, tB) {
+  const grid = document.getElementById('raceGrid');
+  grid.innerHTML = `
+    <div class="race-card">
+      <div class="race-card-title">RACE TO 5</div>
+      <div class="race-team-row">
+        <span class="race-team-name" style="color:var(--gold)">${tA.name}</span>
+        <span>
+          <span class="race-prob" style="color:${race.race5A > 0.5 ? 'var(--accent)' : 'var(--text-dim)'}">${(race.race5A*100).toFixed(1)}%</span>
+          <span class="race-ml">${formatML(race.ml5A)}</span>
+        </span>
+      </div>
+      <div class="race-team-row">
+        <span class="race-team-name" style="color:var(--blue)">${tB.name}</span>
+        <span>
+          <span class="race-prob" style="color:${race.race5B > 0.5 ? 'var(--accent)' : 'var(--text-dim)'}">${(race.race5B*100).toFixed(1)}%</span>
+          <span class="race-ml">${formatML(race.ml5B)}</span>
+        </span>
+      </div>
+    </div>
+    <div class="race-card">
+      <div class="race-card-title">RACE TO 10</div>
+      <div class="race-team-row">
+        <span class="race-team-name" style="color:var(--gold)">${tA.name}</span>
+        <span>
+          <span class="race-prob" style="color:${race.race10A > 0.5 ? 'var(--accent)' : 'var(--text-dim)'}">${(race.race10A*100).toFixed(1)}%</span>
+          <span class="race-ml">${formatML(race.ml10A)}</span>
+        </span>
+      </div>
+      <div class="race-team-row">
+        <span class="race-team-name" style="color:var(--blue)">${tB.name}</span>
+        <span>
+          <span class="race-prob" style="color:${race.race10B > 0.5 ? 'var(--accent)' : 'var(--text-dim)'}">${(race.race10B*100).toFixed(1)}%</span>
+          <span class="race-ml">${formatML(race.ml10B)}</span>
+        </span>
+      </div>
+    </div>
+  `;
+}
+
+
+function lookupTRTeam(statMap, kpName) {
+  const low = kpName.toLowerCase().trim();
+  // 1. Try mapped name
+  const mapped = KP_TO_TR[low];
+  if (mapped) {
+    const mappedLow = mapped.toLowerCase();
+    if (statMap[mappedLow] !== undefined) return statMap[mappedLow];
+  }
+  // 2. Direct match
+  if (statMap[low] !== undefined) return statMap[low];
+  // 3. Strip periods
+  const cleaned = low.replace(/\./g, '');
+  if (statMap[cleaned] !== undefined) return statMap[cleaned];
+  // 4. Substring match (both directions)
+  for (const key of Object.keys(statMap)) {
+    if (key.includes(cleaned) || cleaned.includes(key)) return statMap[key];
+  }
+  // 5. Word match — check if all significant words appear
+  const words = cleaned.split(/\s+/).filter(w => w.length > 2);
+  for (const key of Object.keys(statMap)) {
+    const keyWords = key.split(/\s+/);
+    if (words.length > 0 && words.every(w => keyWords.some(kw => kw.includes(w) || w.includes(kw)))) {
+      return statMap[key];
+    }
+  }
+  return null;
+}
+
+async function fetchAndRenderFF(tA, tB) {
+  const ffEl = document.getElementById('ffContent');
+  ffEl.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;font-family:var(--mono);font-size:12px">Fetching Four Factors from TeamRankings...</div>';
+
+  const results = {};
+  const statKeys = Object.keys(TR_STATS);
+  const diagnostics = { fetched: 0, parsed: 0, matchedA: 0, matchedB: 0, errors: [] };
+
+  // Fetch all 8 stat pages in parallel
+  const fetches = statKeys.map(async (key) => {
+    const cacheKey = 'tr_' + key;
+    // Check memory cache (3hr TTL)
+    if (STATE.trCache[cacheKey] && (Date.now() - STATE.trCache[cacheKey].ts < 3 * 60 * 60 * 1000)) {
+      results[key] = STATE.trCache[cacheKey].data;
+      diagnostics.fetched++;
+      return;
+    }
+    const html = await fetchTRPage(TR_STATS[key].url);
+    if (html) {
+      diagnostics.fetched++;
+      const map = parseTRTable(html);
+      diagnostics.parsed += Object.keys(map).length;
+      results[key] = map;
+      STATE.trCache[cacheKey] = { data: map, ts: Date.now() };
+    } else {
+      diagnostics.errors.push(key + ': fetch failed');
+    }
+  });
+
+  try {
+    await Promise.all(fetches);
+  } catch(e) {
+    ffEl.innerHTML = `<div style="text-align:center;color:var(--red);padding:20px;font-family:var(--mono);font-size:12px">Failed to fetch TeamRankings data. Error: ${e.message}</div>`;
+    return;
+  }
+
+  // Extract values for both teams
+  const ff = { A: {}, B: {} };
+  let fetchedCount = 0;
+  const lookupFailsA = [], lookupFailsB = [];
+  for (const key of statKeys) {
+    if (!results[key]) { lookupFailsA.push(key + ': no data'); continue; }
+    const valA = lookupTRTeam(results[key], tA.name);
+    const valB = lookupTRTeam(results[key], tB.name);
+    if (valA !== null) { ff.A[key] = valA; fetchedCount++; diagnostics.matchedA++; }
+    else { lookupFailsA.push(key); }
+    if (valB !== null) { ff.B[key] = valB; fetchedCount++; diagnostics.matchedB++; }
+    else { lookupFailsB.push(key); }
+  }
+
+  if (fetchedCount < 4) {
+    // Show diagnostic info
+    const sampleKeys = Object.keys(results).length > 0 ? Object.keys(Object.values(results)[0]).slice(0, 8).join(', ') : 'none';
+    ffEl.innerHTML = `<div style="text-align:center;padding:20px;font-family:var(--mono);font-size:11px;line-height:1.8">
+      <div style="color:var(--orange);font-size:13px;margin-bottom:8px">Could not match teams on TeamRankings</div>
+      <div style="color:var(--text-muted)">Pages fetched: ${diagnostics.fetched}/8 | Teams parsed per page: ~${diagnostics.fetched > 0 ? Math.round(diagnostics.parsed / diagnostics.fetched) : 0}</div>
+      <div style="color:var(--text-muted)">${tA.name} matched: ${diagnostics.matchedA}/8 ${lookupFailsA.length > 0 ? '(missed: ' + lookupFailsA.slice(0,3).join(', ') + ')' : ''}</div>
+      <div style="color:var(--text-muted)">${tB.name} matched: ${diagnostics.matchedB}/8 ${lookupFailsB.length > 0 ? '(missed: ' + lookupFailsB.slice(0,3).join(', ') + ')' : ''}</div>
+      <div style="color:var(--text-muted)">Sample TR names: ${sampleKeys}</div>
+      ${diagnostics.errors.length > 0 ? '<div style="color:var(--red)">Errors: ' + diagnostics.errors.join(', ') + '</div>' : ''}
+    </div>`;
+    return;
+  }
+
+  // Build matchup table
+  const factors = [
+    { label: 'eFG%', offKey: 'efg_off', defKey: 'efg_def', higher: true, weight: 40 },
+    { label: 'TO%',  offKey: 'to_off',  defKey: 'to_def',  higher: false, weight: 25 },
+    { label: 'OR%',  offKey: 'or_off',  defKey: 'or_def',  higher: true, weight: 20 },
+    { label: 'FTR',  offKey: 'ftr_off', defKey: 'ftr_def', higher: true, weight: 15 },
+  ];
+
+  let matchupScore = 0;
+
+  let tableHTML = `<table class="ff-table">
+    <thead><tr>
+      <th>Factor</th>
+      <th>${tA.name} Off</th>
+      <th>${tB.name} Def</th>
+      <th>Edge</th>
+      <th>${tB.name} Off</th>
+      <th>${tA.name} Def</th>
+      <th>Edge</th>
+    </tr></thead><tbody>`;
+
+  for (const f of factors) {
+    const aOff = ff.A[f.offKey];
+    const bDef = ff.B[f.defKey];
+    const bOff = ff.B[f.offKey];
+    const aDef = ff.A[f.defKey];
+
+    // Edge A: A's offense vs B's defense
+    let edgeA = null, edgeB = null;
+    if (aOff != null && bDef != null) {
+      edgeA = f.higher ? (aOff - bDef) : (bDef - aOff); // positive = A has advantage
+    }
+    if (bOff != null && aDef != null) {
+      edgeB = f.higher ? (bOff - aDef) : (aDef - bOff); // positive = B has advantage
+    }
+
+    if (edgeA != null) matchupScore += edgeA * f.weight;
+    if (edgeB != null) matchupScore -= edgeB * f.weight;
+
+    const fmtVal = (v) => v != null ? v.toFixed(1) : '—';
+    const fmtEdge = (e) => {
+      if (e == null) return '<td>—</td>';
+      const cls = e > 0.5 ? 'edge-pos' : e < -0.5 ? 'edge-neg' : '';
+      return `<td class="${cls}">${e > 0 ? '+' : ''}${e.toFixed(1)}</td>`;
+    };
+
+    tableHTML += `<tr>
+      <td style="font-weight:700;text-align:left">${f.label} <span style="color:var(--text-muted);font-weight:400;font-size:10px">(${f.weight}%)</span></td>
+      <td>${fmtVal(aOff)}</td>
+      <td>${fmtVal(bDef)}</td>
+      ${fmtEdge(edgeA)}
+      <td>${fmtVal(bOff)}</td>
+      <td>${fmtVal(aDef)}</td>
+      ${fmtEdge(edgeB != null ? -edgeB : null)}
+    </tr>`;
+  }
+
+  tableHTML += '</tbody></table>';
+
+  // Matchup score summary
+  const scoreColor = matchupScore > 5 ? 'var(--accent)' : matchupScore < -5 ? 'var(--red)' : 'var(--text-dim)';
+  const scoreFavor = matchupScore > 0 ? tA.name : matchupScore < 0 ? tB.name : 'Even';
+  tableHTML += `<div style="margin-top:12px;text-align:center;font-family:var(--mono);font-size:13px">
+    Matchup Score: <span style="color:${scoreColor};font-weight:700;font-size:16px">${matchupScore > 0 ? '+' : ''}${matchupScore.toFixed(1)}</span>
+    <span style="color:var(--text-muted);margin-left:8px">Favors ${scoreFavor}</span>
+  </div>`;
+
+  // Explanation
+  tableHTML += `<div style="margin-top:16px;padding:14px 16px;background:var(--bg);border-radius:var(--radius);font-size:12px;line-height:1.7;color:var(--text-dim)">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">How to read this</div>
+    <b style="color:var(--text)">eFG% (40%)</b> — Shooting efficiency adjusted for 3s being worth more. Largest single factor in scoring. A big eFG% edge means one team gets better looks.<br>
+    <b style="color:var(--text)">TO% (25%)</b> — Turnovers per possession. Lower is better on offense, higher is better on defense. A team that forces turnovers without committing them compounds possession advantages.<br>
+    <b style="color:var(--text)">OR% (20%)</b> — Offensive rebounding rate. Second-chance points extend possessions. A team dominating OR% gets free extra shots the opponent doesn't.<br>
+    <b style="color:var(--text)">FTR (15%)</b> — Free throw rate (FTA per FGA). Getting to the line means easy points and puts the opponent in foul trouble. Matters most late in close games.<br><br>
+    <b style="color:var(--text)">Matchup Score</b> — Weighted composite of all four factors comparing each team's offense vs the other's defense. <span style="color:var(--accent)">Positive = favors Team A</span>, <span style="color:var(--red)">Negative = favors Team B</span>. Use it to <b style="color:var(--text)">confirm or challenge</b> your spread verdict — if the spread says BET but the matchup score disagrees, the edge may be weaker than the numbers suggest.
+  </div>`;
+
+  ffEl.innerHTML = tableHTML;
+}
+
+// ---- RECENT GAMES & HEAD-TO-HEAD (ESPN API) ----
+
+// Build full ESPN team ID map from conferences endpoint
+async function buildESPNTeamMap() {
+  const cacheKey = 'espn_id_map';
+  if (STATE.trCache[cacheKey] && (Date.now() - STATE.trCache[cacheKey].ts < 24*60*60*1000)) {
+    return STATE.trCache[cacheKey].data;
+  }
+
+  const map = {};
+  // ESPN groups endpoint returns all D1 teams organized by conference
+  // Groups 1-50 cover all conferences
+  try {
+    const resp = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams?limit=500', { signal: AbortSignal.timeout(15000) });
+    if (resp.ok) {
+      const data = await resp.json();
+      // Try multiple response shapes ESPN uses
+      const teamList = data.sports?.[0]?.leagues?.[0]?.teams || data.teams || [];
+      for (const item of teamList) {
+        const t = item.team || item;
+        const id = t.id;
+        if (!id) continue;
+        // Index by every name variant ESPN provides
+        if (t.displayName) map[t.displayName.toLowerCase()] = id;
+        if (t.shortDisplayName) map[t.shortDisplayName.toLowerCase()] = id;
+        if (t.name) map[t.name.toLowerCase()] = id;
+        if (t.nickname) map[t.nickname.toLowerCase()] = id;
+        if (t.abbreviation) map[t.abbreviation.toLowerCase()] = id;
+        // Also store by location if available
+        if (t.location) map[t.location.toLowerCase()] = id;
+      }
+    }
+  } catch(e) {}
+
+  // If main endpoint didn't return enough, try paginated approach
+  if (Object.keys(map).length < 100) {
+    for (let page = 1; page <= 4; page++) {
+      try {
+        const resp = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams?limit=100&page=${page}`, { signal: AbortSignal.timeout(10000) });
+        if (!resp.ok) continue;
+        const data = await resp.json();
+        const teamList = data.sports?.[0]?.leagues?.[0]?.teams || data.teams || [];
+        for (const item of teamList) {
+          const t = item.team || item;
+          if (!t.id) continue;
+          if (t.displayName) map[t.displayName.toLowerCase()] = t.id;
+          if (t.shortDisplayName) map[t.shortDisplayName.toLowerCase()] = t.id;
+          if (t.name) map[t.name.toLowerCase()] = t.id;
+          if (t.location) map[t.location.toLowerCase()] = t.id;
+          if (t.abbreviation) map[t.abbreviation.toLowerCase()] = t.id;
+        }
+        if (teamList.length < 100) break; // no more pages
+      } catch(e) { break; }
+    }
+  }
+
+  if (Object.keys(map).length > 50) {
+    STATE.trCache[cacheKey] = { data: map, ts: Date.now() };
+  }
+  return map;
+}
+
+async function findESPNTeamId(teamName) {
+  const low = teamName.toLowerCase().trim().replace(/\./g, '');
+
+  // Check localStorage for previously found IDs
+  const cachedId = STATE.trCache['espn_id_' + low];
+  if (cachedId) return cachedId;
+
+  // Build or retrieve the full map
+  const map = await buildESPNTeamMap();
+
+  // Direct match
+  if (map[low]) { STATE.trCache['espn_id_' + low] = map[low]; return map[low]; }
+
+  // Fuzzy: substring both directions
+  for (const [key, id] of Object.entries(map)) {
+    if (key.includes(low) || low.includes(key)) { STATE.trCache['espn_id_' + low] = id; return id; }
+  }
+
+  // Word match: all significant words must appear
+  const words = low.split(/\s+/).filter(w => w.length > 2);
+  for (const [key, id] of Object.entries(map)) {
+    if (words.length > 0 && words.every(w => key.includes(w))) { STATE.trCache['espn_id_' + low] = id; return id; }
+  }
+
+  // Last resort: direct search API
+  try {
+    const resp = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams?search=${encodeURIComponent(low)}&limit=5`, { signal: AbortSignal.timeout(8000) });
+    if (resp.ok) {
+      const data = await resp.json();
+      const items = data.sports?.[0]?.leagues?.[0]?.teams || data.teams || [];
+      if (items.length > 0) {
+        const t = items[0].team || items[0];
+        STATE.trCache['espn_id_' + low] = t.id;
+        return t.id;
+      }
+    }
+  } catch(e) {}
+
+  return null;
+}
+
+async function fetchESPNSchedule(teamId) {
+  try {
+    const resp = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams/${teamId}/schedule`, { signal: AbortSignal.timeout(10000) });
+    if (resp.ok) return await resp.json();
+  } catch(e) {}
+  return null;
+}
+
+function parseESPNGames(scheduleData, teamId) {
+  const games = [];
+  
+  // ESPN schedule endpoint can return data in multiple shapes:
+  // Shape 1: { events: [...] } — each event has competitions with competitors
+  // Shape 2: { team: { schedule: [...] } } — schedule items with result
+  // Shape 3: { items: [...] } — flat list
+  // Shape 4: { events: [...] } where events have seasonType and week nesting
+
+  // Collect all possible event-like objects
+  let events = scheduleData?.events || [];
+  
+  // Shape 2: team.schedule or team.nextEvent
+  if (events.length === 0 && scheduleData?.team?.record?.items) {
+    // Record items have stats but not game details — skip
+  }
+
+  // Try to find events from other locations
+  if (events.length === 0) {
+    // Some responses nest under requestedSeason
+    events = scheduleData?.requestedSeason?.events || [];
+  }
+  if (events.length === 0) {
+    events = scheduleData?.items || [];
+  }
+
+  // Store debug info
+  const topKeys = Object.keys(scheduleData || {}).join(',');
+  STATE._debugESPN = { topKeys, eventCount: events.length, sampleEvent: null };
+
+  for (const ev of events) {
+    // Try competitions array first (standard format)
+    const comps = ev.competitions || [];
+    
+    if (comps.length > 0) {
+      const comp = comps[0];
+      if (!comp.competitors || comp.competitors.length < 2) continue;
+      
+      // Check if game is completed — try multiple fields
+      const isCompleted = 
+        ev.status?.type?.completed === true ||
+        ev.status?.type?.name === 'STATUS_FINAL' ||
+        ev.status?.type?.state === 'post' ||
+        comp.status?.type?.completed === true ||
+        (ev.competitions?.[0]?.status?.type?.name === 'STATUS_FINAL');
+      
+      if (!isCompleted) continue;
+      
+      const c0 = comp.competitors[0];
+      const c1 = comp.competitors[1];
+      const us = [c0,c1].find(c => String(c.id) === String(teamId) || String(c.team?.id) === String(teamId)) || c0;
+      const them = us === c0 ? c1 : c0;
+      
+      // Score can be in multiple places
+      const ourPts = parseInt(us.score?.value ?? us.score?.displayValue ?? us.score);
+      const theirPts = parseInt(them.score?.value ?? them.score?.displayValue ?? them.score);
+      if (isNaN(ourPts) || isNaN(theirPts)) continue;
+      
+      const date = ev.date ? ev.date.split('T')[0] : '?';
+      const oppName = them.team?.displayName || them.team?.shortDisplayName || them.team?.name || '?';
+      const loc = comp.neutralSite ? 'N' : (us.homeAway === 'away' ? '@' : '');
+      games.push({ date, opponent: oppName, teamPts: ourPts, oppPts: theirPts, won: ourPts > theirPts, location: loc, result: (ourPts > theirPts ? 'W' : 'L') + ' ' + ourPts + '-' + theirPts });
+    } 
+    // Alternative: event might have atVs, opponent, result directly (flat schedule format)
+    else if (ev.opponent || ev.atVs) {
+      const score = ev.score || ev.result?.displayValue || '';
+      const scoreMatch = score.match(/(\d+)\s*-\s*(\d+)/);
+      if (!scoreMatch) continue;
+      const isWin = ev.result?.winner === true || ev.gameResult === 'W';
+      const p1 = parseInt(scoreMatch[1]), p2 = parseInt(scoreMatch[2]);
+      const ourPts = isWin ? Math.max(p1,p2) : Math.min(p1,p2);
+      const theirPts = isWin ? Math.min(p1,p2) : Math.max(p1,p2);
+      const date = ev.date ? ev.date.split('T')[0] : '?';
+      const oppName = ev.opponent?.displayName || ev.opponent?.name || '?';
+      games.push({ date, opponent: oppName, teamPts: ourPts, oppPts: theirPts, won: ourPts > theirPts, location: ev.atVs === '@' ? '@' : '', result: (ourPts > theirPts ? 'W' : 'L') + ' ' + ourPts + '-' + theirPts });
+    }
+  }
+
+  // Debug: store first event for diagnostics
+  if (events.length > 0) {
+    STATE._debugESPN.sampleEvent = JSON.stringify(events[0]).substring(0, 500);
+  }
+
+  return games;
+}
+
+async function fetchAndRenderRecent(tA, tB) {
+  const section = document.getElementById('recentSection');
+  const content = document.getElementById('recentContent');
+  section.style.display = '';
+  content.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;font-family:var(--mono);font-size:12px">Fetching recent games from ESPN...</div>';
+  let gamesA = [], gamesB = [], fetchErrors = [];
+  let idA = null, idB = null;
+  try {
+    [idA, idB] = await Promise.all([findESPNTeamId(tA.name), findESPNTeamId(tB.name)]);
+    if (!idA) fetchErrors.push(tA.name + ': not found on ESPN');
+    if (!idB) fetchErrors.push(tB.name + ': not found on ESPN');
+    const [schedA, schedB] = await Promise.all([idA ? fetchESPNSchedule(idA) : null, idB ? fetchESPNSchedule(idB) : null]);
+    if (schedA) {
+      gamesA = parseESPNGames(schedA, idA);
+      if (gamesA.length === 0) {
+        const dbg = STATE._debugESPN || {};
+        fetchErrors.push(tA.name + ': 0 games parsed (ID:' + idA + ' keys:' + dbg.topKeys + ' events:' + dbg.eventCount + ')');
+        if (dbg.sampleEvent) fetchErrors.push('Sample: ' + dbg.sampleEvent.substring(0, 200));
+      }
+    } else if (idA) {
+      fetchErrors.push(tA.name + ': schedule fetch failed (ID: ' + idA + ')');
+    }
+    if (schedB) {
+      gamesB = parseESPNGames(schedB, idB);
+      if (gamesB.length === 0) {
+        const dbg = STATE._debugESPN || {};
+        fetchErrors.push(tB.name + ': 0 games parsed (ID:' + idB + ' keys:' + dbg.topKeys + ' events:' + dbg.eventCount + ')');
+        if (dbg.sampleEvent) fetchErrors.push('Sample: ' + dbg.sampleEvent.substring(0, 200));
+      }
+    } else if (idB) {
+      fetchErrors.push(tB.name + ': schedule fetch failed (ID: ' + idB + ')');
+    }
+  } catch(e) { fetchErrors.push('Network: ' + e.message); }
+
+  let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
+  function renderLast3(name, games, isGold) {
+    const color = isGold ? 'var(--gold)' : 'var(--blue)';
+    let out = `<div><div style="font-family:var(--mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Last 3 — <span style="color:${color}">${name}</span></div>`;
+    const last3 = games.slice(-3);
+    if (last3.length === 0) { out += '<div style="color:var(--text-muted);font-size:12px;padding:8px;font-family:var(--mono)">No games found</div>'; }
+    else {
+      for (const g of [...last3].reverse()) {
+        const wlColor = g.won ? 'var(--accent)' : 'var(--red)';
+        const locIcon = g.location === '@' ? '@ ' : g.location === 'N' ? 'N ' : '';
+        out += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--surface2);border-radius:var(--radius);margin-bottom:4px;border-left:3px solid ${wlColor}"><div><span style="font-family:var(--mono);font-size:12px;color:${wlColor};font-weight:700">${g.won?'W':'L'}</span><span style="font-size:12px;color:var(--text-dim);margin-left:8px">${locIcon}${g.opponent}</span></div><div style="text-align:right"><span style="font-family:var(--mono);font-size:13px;color:var(--text);font-weight:700">${g.teamPts}-${g.oppPts}</span><span style="font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-left:6px">${g.date}</span></div></div>`;
+      }
+      const avgPts = (last3.reduce((s,g)=>s+g.teamPts,0)/last3.length).toFixed(1);
+      const avgOpp = (last3.reduce((s,g)=>s+g.oppPts,0)/last3.length).toFixed(1);
+      const wins = last3.filter(g=>g.won).length;
+      out += `<div style="font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:6px;text-align:center">${wins}-${last3.length-wins} last 3 · Avg: ${avgPts} scored / ${avgOpp} allowed</div>`;
+    }
+    return out + '</div>';
+  }
+  html += renderLast3(tA.name, gamesA, true);
+  html += renderLast3(tB.name, gamesB, false);
+  html += '</div>';
+
+  // H2H
+  const h2h = [];
+  const bLow = tB.name.toLowerCase();
+  for (const g of gamesA) { const o = (g.opponent||'').toLowerCase(); if (o.includes(bLow)||bLow.includes(o)||(bLow.split(' ').filter(w=>w.length>3).some(w=>o.includes(w)))) h2h.push({...g, perspective:tA.name}); }
+  if (!h2h.length) { const aLow = tA.name.toLowerCase(); for (const g of gamesB) { const o=(g.opponent||'').toLowerCase(); if(o.includes(aLow)||aLow.includes(o)||(aLow.split(' ').filter(w=>w.length>3).some(w=>o.includes(w)))) h2h.push({...g,perspective:tB.name}); } }
+
+  if (h2h.length > 0) {
+    html += `<div style="margin-top:16px"><div style="font-family:var(--mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">🆚 Head-to-Head This Season</div>`;
+    for (const g of h2h) {
+      const wlColor = g.won ? 'var(--accent)' : 'var(--red)';
+      html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface2);border-radius:var(--radius);margin-bottom:4px;border-left:3px solid ${wlColor}"><div><span style="font-family:var(--mono);font-size:13px;color:${wlColor};font-weight:700">${g.won?'W':'L'}</span><span style="font-size:13px;color:var(--text);font-weight:600;margin-left:8px">${g.perspective} ${g.won?'beat':'lost to'} ${g.opponent}</span></div><div style="text-align:right"><span style="font-family:var(--mono);font-size:15px;color:var(--text);font-weight:700">${g.teamPts}-${g.oppPts}</span><span style="font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-left:8px">${g.date}</span></div></div>`;
+    }
+    html += '</div>';
+  } else if (gamesA.length > 0 || gamesB.length > 0) {
+    html += '<div style="margin-top:16px;font-family:var(--mono);font-size:12px;color:var(--text-muted);text-align:center">🆚 No head-to-head matchup found this season</div>';
+  }
+  if (fetchErrors.length > 0) html += `<div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--orange);text-align:center">${fetchErrors.join(' · ')}</div>`;
+  content.innerHTML = html;
+}
+// ---- BET LOG ----
+
+// Determine edge tier label and CSS class
+function getEdgeTier(edgeVal, mode) {
+  const cls = getEdgeClass(edgeVal, mode);
+  if (cls === 'bet-9') return { label: '🟣 PURPLE', css: 'tier-purple' };
+  if (cls === 'bet-7') return { label: '🟢 GREEN', css: 'tier-lime' };
+  if (cls === 'bet-5') return { label: '🔵 BLUE', css: 'tier-blue' };
+  if (cls === 'bet-3') return { label: '🟡 YELLOW', css: 'tier-yellow' };
+  return { label: '—', css: '' };
+}
+
+// Build available bets and render checkboxes after each calculation
+function renderLogCheckboxes() {
+  const r = STATE.lastResult;
+  const container = document.getElementById('logCheckboxes');
+  if (!r) { container.innerHTML = ''; return; }
+
+  STATE.availableBets = [];
+
+  // Spread
+  if (isBettable(r.edges.spreadEdge, 'pts', Math.abs(r.mktSp))) {
+    const side = r.edges.spreadSide === 'A' ? r.tA.name : r.tB.name;
+    const tier = getEdgeTier(r.edges.spreadEdge, 'pts');
+    STATE.availableBets.push({
+      type: 'Spread', side: side + ' ' + formatSpread(r.edges.spreadLine),
+      myLine: formatSpread(r.model.modelSpread), mktLine: formatSpread(r.mktSp),
+      edge: r.edges.spreadEdge.toFixed(1) + 'pt',
+      betAmt: Math.round(getBetSize(r.edges.spreadEdge, r.br, 'pts').amt),
+      tier: tier.label, tierCss: tier.css,
+    });
+  }
+  // Total
+  if (isBettable(r.edges.totalEdge, 'total')) {
+    const tier = getEdgeTier(r.edges.totalEdge, 'total');
+    STATE.availableBets.push({
+      type: 'Total', side: r.edges.totalSide + ' ' + r.mktTo,
+      myLine: r.model.blendedTotal.toFixed(1), mktLine: '' + r.mktTo,
+      edge: r.edges.totalEdge.toFixed(1) + 'pt',
+      betAmt: Math.round(getBetSizeForTotal(r.edges.totalEdge, r.br).amt),
+      tier: tier.label, tierCss: tier.css,
+    });
+  }
+  // ML — only show if spread confirms (Fix 3: spread must have ≥2pt edge and agree on side)
+  const spreadHasEdge = isBettable(r.edges.spreadEdge, 'pts', Math.abs(r.mktSp));
+  const spreadFavorsA = r.edges.spreadSide === 'A';
+  if (r.mlEdge.mlSide && isBettable(r.mlEdge.mlEdgePct, 'ml') && spreadHasEdge) {
+    const mlFavorsA = r.mlEdge.mlSide === 'A';
+    if (spreadFavorsA === mlFavorsA) {
+      const side = (r.mlEdge.mlSide === 'A' ? r.tA.name : r.tB.name);
+      const tier = getEdgeTier(r.mlEdge.mlEdgePct, 'ml');
+      STATE.availableBets.push({
+        type: 'ML', side: side + ' ' + formatML(r.mlEdge.mlLine),
+        myLine: (r.mc.winProbA * 100).toFixed(1) + '%', mktLine: formatML(r.mlEdge.mlLine),
+        edge: r.mlEdge.mlEdgePct.toFixed(1) + '% EV',
+        betAmt: Math.round(getBetSize(r.mlEdge.mlEdgePct, r.br, 'ml').amt),
+        tier: tier.label, tierCss: tier.css,
+        mlOdds: r.mlEdge.mlLine,
+      });
+    }
+  }
+
+  if (STATE.availableBets.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-muted);font-size:12px">No actionable edges to log.</div>';
+    return;
+  }
+
+  container.innerHTML = STATE.availableBets.map((b, i) => `
+    <label class="log-check" id="lc_${i}" onclick="toggleLogCheck(${i})">
+      <span class="lc-dot"></span>
+      <span class="${b.tierCss}" style="font-weight:700">${b.type}</span>
+      <span style="color:var(--text-dim)">${b.side}</span>
+      <span style="color:var(--text-muted)">${b.edge}</span>
+      <input type="checkbox" id="lcbox_${i}">
+    </label>
+  `).join('');
+}
+
+function toggleLogCheck(i) {
+  const el = document.getElementById('lc_' + i);
+  const box = document.getElementById('lcbox_' + i);
+  box.checked = !box.checked;
+  el.classList.toggle('checked', box.checked);
+}
+
+function logSelectedBets() {
+  const r = STATE.lastResult;
+  if (!r || !STATE.availableBets) { alert('Run a calculation first.'); return; }
+
+  const selected = [];
+  for (let i = 0; i < STATE.availableBets.length; i++) {
+    const box = document.getElementById('lcbox_' + i);
+    if (box && box.checked) selected.push(STATE.availableBets[i]);
+  }
+
+  if (selected.length === 0) { alert('Select at least one bet to log.'); return; }
+
+  const matchup = r.tA.name + ' vs ' + r.tB.name;
+  const now = new Date().toLocaleDateString();
+
+  for (const b of selected) {
+    STATE.betLog.push({
+      date: now, matchup, type: b.type, side: b.side,
+      myLine: b.myLine, mktLine: b.mktLine, edge: b.edge,
+      betAmt: b.betAmt, tier: b.tier, tierCss: b.tierCss,
+      mlOdds: b.mlOdds || null, // American odds for ML payout calc
+      result: '', pnl: 0, clv: '', closeLine: '', bankroll: STATE.bankroll,
+    });
+  }
+
+  saveBetLog();
+  renderBetLog();
+  alert(`Logged ${selected.length} bet(s).`);
+}
+
+function renderBetLog() {
+  const tbody = document.getElementById('logBody');
+  tbody.innerHTML = '';
+
+  for (let i = 0; i < STATE.betLog.length; i++) {
+    const b = STATE.betLog[i];
+    const tierCss = b.tierCss || '';
+    const tierLabel = b.tier || '—';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${b.date}</td>
+      <td>${b.matchup}</td>
+      <td>${b.type}</td>
+      <td class="${tierCss}" style="font-weight:700">${tierLabel}</td>
+      <td>${b.side}</td>
+      <td>${b.myLine}</td>
+      <td>${b.mktLine}</td>
+      <td>${b.edge}</td>
+      <td>$${b.betAmt}</td>
+      <td>
+        <select onchange="updateResult(${i}, this.value)" style="background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px;font-family:var(--mono);font-size:12px">
+          <option value="" ${b.result===''?'selected':''}>—</option>
+          <option value="W" ${b.result==='W'?'selected':''}>W</option>
+          <option value="L" ${b.result==='L'?'selected':''}>L</option>
+          <option value="P" ${b.result==='P'?'selected':''}>Push</option>
+        </select>
+      </td>
+      <td class="${b.pnl > 0 ? 'log-win' : b.pnl < 0 ? 'log-loss' : ''}">${b.pnl > 0 ? '+' : ''}${b.pnl !== 0 ? '$' + b.pnl : '—'}</td>
+      <td>$${b.bankroll.toLocaleString()}</td>
+      <td><button onclick="deleteBet(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:4px 8px;opacity:0.5;transition:opacity 0.15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" title="Remove this bet">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+function updateResult(idx, val) {
+  const b = STATE.betLog[idx];
+  b.result = val;
+
+  if (val === 'W') {
+    if (b.type === 'ML' && b.mlOdds) {
+      // Moneyline payout based on American odds
+      const odds = parseFloat(b.mlOdds);
+      if (odds > 0) {
+        // Underdog: +280 means $100 wins $280, so betAmt wins betAmt * (odds/100)
+        b.pnl = Math.round(b.betAmt * (odds / 100));
+      } else {
+        // Favorite: -350 means bet $350 to win $100, so betAmt wins betAmt * (100/|odds|)
+        b.pnl = Math.round(b.betAmt * (100 / Math.abs(odds)));
+      }
+    } else if (b.type === 'ML' && !b.mlOdds) {
+      // Fallback: try parsing odds from mktLine string (e.g. "+280" or "-350")
+      const parsed = parseFloat(b.mktLine);
+      if (!isNaN(parsed) && parsed !== 0) {
+        if (parsed > 0) b.pnl = Math.round(b.betAmt * (parsed / 100));
+        else b.pnl = Math.round(b.betAmt * (100 / Math.abs(parsed)));
+      } else {
+        b.pnl = Math.round(b.betAmt * 0.909); // last resort
+      }
+    } else {
+      // Spread/Total: standard -110 juice (bet $110 to win $100)
+      b.pnl = Math.round(b.betAmt * 0.909);
+    }
+  } else if (val === 'L') {
+    b.pnl = -b.betAmt;
+  } else {
+    b.pnl = 0; // Push
+  }
+
+  // Recalc running bankroll
+  let running = STATE.startingBankroll || 1000;
+  for (const bet of STATE.betLog) {
+    running += bet.pnl;
+    bet.bankroll = running;
+  }
+  STATE.bankroll = running;
+
+  saveBetLog();
+  renderBetLog();
+  renderROI();
+  document.getElementById('bankrollInput').value = STATE.bankroll;
+}
+
+function updateCloseLine(idx, val) {
+  const b = STATE.betLog[idx];
+  b.closeLine = val;
+  
+  // Auto-calculate CLV: closing line minus your bet line
+  // For spreads: CLV = |close| - |yourLine| (positive = you got a better number)
+  // For totals: CLV = close - yourLine for OVER (positive = line dropped after you bet over)
+  //             CLV = yourLine - close for UNDER (positive = line rose after you bet under)
+  const closeNum = parseFloat(val);
+  const myNum = parseFloat(b.mktLine);
+  
+  if (!isNaN(closeNum) && !isNaN(myNum)) {
+    if (b.type === 'Spread') {
+      // Sign-aware CLV:
+      // Underdog +8.5 closes +7.5 → you got +1.0 CLV (myNum - closeNum for positive lines)
+      // Favorite -8.5 closes -9.5 → you got +1.0 CLV (closeNum - myNum for negative lines)
+      if (myNum > 0) {
+        b.clv = parseFloat((myNum - closeNum).toFixed(1));
+      } else {
+        b.clv = parseFloat((closeNum - myNum).toFixed(1));
+      }
+    } else if (b.type === 'Total') {
+      // For OVER: if you bet OVER 154.5 and it closes at 156, line moved toward you = +1.5 CLV
+      if (b.side.includes('OVER')) {
+        b.clv = parseFloat((closeNum - myNum).toFixed(1));
+      } else {
+        b.clv = parseFloat((myNum - closeNum).toFixed(1));
+      }
+    } else {
+      // ML: just store raw difference
+      b.clv = parseFloat((closeNum - myNum).toFixed(1));
+    }
+  } else {
+    b.clv = '';
+  }
+  
+  saveBetLog();
+  renderBetLog();
+  renderROI();
+}
+
+function updateStartingBankroll(val) {
+  const br = parseFloat(val) || 1000;
+  STATE.startingBankroll = br;
+  STATE.bankroll = br;
+
+  // Recalculate entire bet log from new starting point
+  let running = br;
+  for (const bet of STATE.betLog) {
+    running += bet.pnl;
+    bet.bankroll = running;
+  }
+  STATE.bankroll = running;
+
+  saveBetLog();
+  renderBetLog();
+  renderROI();
+}
+
+function deleteBet(idx) {
+  if (!confirm('Remove this bet?')) return;
+  STATE.betLog.splice(idx, 1);
+
+  // Recalc running bankroll
+  let running = STATE.startingBankroll || 1000;
+  for (const bet of STATE.betLog) {
+    running += bet.pnl;
+    bet.bankroll = running;
+  }
+  STATE.bankroll = running;
+
+  saveBetLog();
+  renderBetLog();
+  renderROI();
+  document.getElementById('bankrollInput').value = STATE.bankroll;
+}
+
+function clearLog() {
+  if (!confirm('Clear all bet history? This cannot be undone.')) return;
+  STATE.betLog = [];
+  saveBetLog();
+  renderBetLog();
+  renderROI();
+}
+
+function exportLog() {
+  if (STATE.betLog.length === 0) { alert('No bets to export.'); return; }
+  const headers = ['Date','Matchup','Type','Tier','Side','My Line','Mkt Line','Edge','Bet $','Result','P&L','Bankroll'];
+  const rows = STATE.betLog.map(b => [b.date,b.matchup,b.type,b.tier||'',b.side,b.myLine,b.mktLine,b.edge,b.betAmt,b.result,b.pnl,b.bankroll]);
+  function csvEscape(v) { const s = String(v ?? ''); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; }
+  const csv = [headers, ...rows].map(r => r.map(csvEscape).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'mr_locks_bets.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ---- ROI DASHBOARD ----
+function renderROI() {
+  const log = STATE.betLog.filter(b => b.result !== '');
+  const grid = document.getElementById('roiGrid');
+
+  if (log.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:40px">No completed bets yet. Mark results in the Bet Log.</div>';
+    return;
+  }
+
+  const totalBets = log.length;
+  const wins = log.filter(b => b.result === 'W').length;
+  const losses = log.filter(b => b.result === 'L').length;
+  const pushes = log.filter(b => b.result === 'P').length;
+  const winRate = totalBets > 0 ? (wins / totalBets * 100).toFixed(1) : 0;
+  const totalWagered = log.reduce((s, b) => s + b.betAmt, 0);
+  const netPnL = log.reduce((s, b) => s + b.pnl, 0);
+  const roi = totalWagered > 0 ? (netPnL / totalWagered * 100).toFixed(1) : 0;
+  const currentBR = log.length > 0 ? log[log.length - 1].bankroll : 1000;
+
+  const avgBet = totalWagered > 0 ? Math.round(totalWagered / totalBets) : 0;
+
+  grid.innerHTML = `
+    <div class="roi-card">
+      <div class="roi-card-label">Record</div>
+      <div class="roi-card-value" style="color:var(--text)">${wins}-${losses}${pushes > 0 ? '-'+pushes : ''}</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-card-label">Win Rate</div>
+      <div class="roi-card-value" style="color:${parseFloat(winRate) >= 55 ? 'var(--accent)' : 'var(--red)'}">${winRate}%</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-card-label">Net P&L</div>
+      <div class="roi-card-value" style="color:${netPnL >= 0 ? 'var(--accent)' : 'var(--red)'}">${netPnL >= 0 ? '+' : ''}$${netPnL.toLocaleString()}</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-card-label">ROI</div>
+      <div class="roi-card-value" style="color:${parseFloat(roi) >= 0 ? 'var(--accent)' : 'var(--red)'}">${roi}%</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-card-label">Bankroll</div>
+      <div class="roi-card-value" style="color:var(--gold)">$${currentBR.toLocaleString()}</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-card-label">Total Wagered</div>
+      <div class="roi-card-value" style="color:var(--text)">$${totalWagered.toLocaleString()}</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-card-label">Avg Bet</div>
+      <div class="roi-card-value" style="color:var(--text)">$${avgBet}</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-card-label">Total Bets</div>
+      <div class="roi-card-value" style="color:var(--text)">${totalBets}</div>
+    </div>
+  `;
+
+  // Draw bankroll chart
+  drawBankrollChart(log);
+}
+
+function drawBankrollChart(log) {
+  const canvas = document.getElementById('roiCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  if (log.length < 2) return;
+
+  const startBR = STATE.startingBankroll || 1000;
+  const brs = [startBR, ...log.map(b => b.bankroll)];
+  const min = Math.min(...brs) * 0.9;
+  const max = Math.max(...brs) * 1.1;
+  const pad = 20;
+  const chartW = W - pad * 2;
+  const chartH = H - pad * 2;
+
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i = 0; i < brs.length; i++) {
+    const x = pad + (i / (brs.length - 1)) * chartW;
+    const y = H - pad - ((brs[i] - min) / (max - min)) * chartH;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = '#00d4aa';
+  ctx.stroke();
+
+  // Starting line
+  const startY = H - pad - ((1000 - min) / (max - min)) * chartH;
+  ctx.strokeStyle = '#ffffff20';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(pad, startY);
+  ctx.lineTo(W - pad, startY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = '#8892a8';
+  ctx.font = '10px JetBrains Mono';
+  ctx.fillText('$' + startBR.toLocaleString(), pad, startY - 4);
+}
+
+// ---- PERSISTENCE ----
+function saveBetLog() {
+  try { localStorage.setItem('sl4_betlog', JSON.stringify(STATE.betLog)); } catch(e) {}
+}
+
+function loadBetLog() {
+  try {
+    const data = localStorage.getItem('sl4_betlog');
+    if (data) STATE.betLog = JSON.parse(data);
+  } catch(e) {}
+}
+
+function saveKenPom() {
+  try { localStorage.setItem('sl4_kenpom', JSON.stringify(STATE.teams)); } catch(e) {}
+}
+
+function loadKenPom() {
+  try {
+    const data = localStorage.getItem('sl4_kenpom');
+    if (data) {
+      STATE.teams = JSON.parse(data);
+      STATE.teamMap = {};
+      for (const t of STATE.teams) STATE.teamMap[t.name.toLowerCase()] = t;
+    }
+  } catch(e) {}
+}
+
+function loadSettings() {
+  try {
+    const s = localStorage.getItem('sl4_settings');
+    if (s) {
+      const d = JSON.parse(s);
+      // Force override stale 103.2 cached from older version
+      STATE.natlAvg = (d.natlAvg && d.natlAvg > 105) ? d.natlAvg : 109.5;
+      STATE.mcSims = d.mcSims || 10000;
+      STATE.hca = d.hca || 3.0;
+    }
+  } catch(e) {}
+}
+
+function saveSettings() {
+  STATE.natlAvg = parseFloat(document.getElementById('natlAvgInput').value) || 109.5;
+  STATE.mcSims = parseInt(document.getElementById('mcSimsInput').value) || 10000;
+  STATE.hca = parseFloat(document.getElementById('hcaInput').value) || 3.0;
+  try { localStorage.setItem('sl4_settings', JSON.stringify({ natlAvg: STATE.natlAvg, mcSims: STATE.mcSims, hca: STATE.hca })); } catch(e) {}
+  closeModal('bankroll');
+}
+
+// Also save KenPom after parsing
+// We override inline instead
+
+// ---- MODALS ----
+function openModal(type) {
+  const map = { kenpom: 'modalKenpom', bankroll: 'modalBankroll', injury: 'modalInjury' };
+  const el = document.getElementById(map[type]);
+  if (el) el.classList.add('show');
+}
+
+function closeModal(type) {
+  const map = { kenpom: 'modalKenpom', bankroll: 'modalBankroll', injury: 'modalInjury' };
+  const el = document.getElementById(map[type]);
+  if (el) el.classList.remove('show');
+}
+
+// ---- TABS ----
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    if (tab.dataset.tab === 'roi') renderROI();
+    if (tab.dataset.tab === 'betlog') renderBetLog();
+  });
+});
+
+// ---- INIT ----
+function init() {
+  loadKenPom();
+  loadBetLog();
+  loadSettings();
+
+  document.getElementById('natlAvgInput').value = STATE.natlAvg;
+  document.getElementById('mcSimsInput').value = STATE.mcSims;
+  document.getElementById('hcaInput').value = STATE.hca;
+
+  setupAutocomplete('teamA', 'acA', 'previewA', 'A');
+  setupAutocomplete('teamB', 'acB', 'previewB', 'B');
+
+  renderBetLog();
+  renderROI();
+
+  if (STATE.teams.length > 0) {
+    console.log(`Mr_Locks v7 loaded with ${STATE.teams.length} teams.`);
+  } else {
+    console.log('Mr_Locks v7 ready. Click "Update KenPom" to load team data.');
+  }
+}
+
+// Override parseKenPom to also save
+window.parseKenPom = function() {
+  const text = document.getElementById('kpTextarea').value;
+  const teams = parseKenPomText(text);
+  if (teams.length < 10) {
+    alert('Parsed fewer than 10 teams — check format (tab-separated).');
+    return;
+  }
+  STATE.teams = teams;
+  STATE.teamMap = {};
+  for (const t of teams) STATE.teamMap[t.name.toLowerCase()] = t;
+  saveKenPom();
+  closeModal('kenpom');
+  const sample = teams[0];
+  const luckCount = teams.filter(t => t.luck !== 0).length;
+  console.log('KenPom debug:', STATE._debugLuck, 'Luck non-zero:', luckCount);
+  alert(`Loaded ${teams.length} teams.`);
+};
+
+init();
+</script>
+</body>
+</html>
